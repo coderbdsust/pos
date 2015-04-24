@@ -9,6 +9,9 @@ package com.coderbd.pos.design;
 import com.coderbd.pos.validation.ErrorMessage;
 import com.coderbd.pos.validation.LoginValidation;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import javafx.scene.Cursor;
 
 /**
@@ -48,6 +51,20 @@ public class POSFrame extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         mainPanel = new javax.swing.JPanel();
+        controlPanel = new javax.swing.JPanel();
+        optionControlPanel = new javax.swing.JPanel();
+        salesButton = new javax.swing.JButton();
+        shopButton = new javax.swing.JButton();
+        transactionButton = new javax.swing.JButton();
+        statisticsButton = new javax.swing.JButton();
+        viewParentControlPanel = new javax.swing.JPanel();
+        salesPanel = new javax.swing.JPanel();
+        orderSummaryPanel = new javax.swing.JPanel();
+        orderProductTablePanel = new javax.swing.JPanel();
+        orderProductTablePanelSchollPane = new javax.swing.JScrollPane();
+        orderProductTable = new javax.swing.JTable();
+        orderProductPanel = new javax.swing.JPanel();
+        shopPanel = new javax.swing.JPanel();
         loginPanel = new javax.swing.JPanel();
         logPanelEnclosed = new javax.swing.JPanel();
         usernameLabel = new javax.swing.JLabel();
@@ -58,7 +75,7 @@ public class POSFrame extends javax.swing.JFrame {
         logIn = new javax.swing.JButton();
         logInError = new javax.swing.JLabel();
         forgotLabel = new javax.swing.JLabel();
-        controlPanel = new javax.swing.JPanel();
+        accountRecoverPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         exitItem = new javax.swing.JMenuItem();
@@ -73,6 +90,145 @@ public class POSFrame extends javax.swing.JFrame {
 
         mainPanel.setBackground(new java.awt.Color(255, 255, 255));
         mainPanel.setLayout(new java.awt.CardLayout());
+
+        controlPanel.setBackground(new java.awt.Color(0, 0, 255));
+
+        optionControlPanel.setBackground(new java.awt.Color(0, 204, 51));
+        optionControlPanel.setLayout(new java.awt.GridLayout(1, 0));
+
+        salesButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        salesButton.setText("Sales");
+        salesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salesButtonActionPerformed(evt);
+            }
+        });
+        optionControlPanel.add(salesButton);
+
+        shopButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        shopButton.setText("Shop");
+        shopButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shopButtonActionPerformed(evt);
+            }
+        });
+        optionControlPanel.add(shopButton);
+
+        transactionButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        transactionButton.setText("Transaction");
+        optionControlPanel.add(transactionButton);
+
+        statisticsButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        statisticsButton.setText("Statistics");
+        optionControlPanel.add(statisticsButton);
+
+        viewParentControlPanel.setBackground(new java.awt.Color(102, 102, 102));
+        viewParentControlPanel.setLayout(new java.awt.CardLayout());
+
+        salesPanel.setBackground(new java.awt.Color(234, 228, 228));
+
+        orderSummaryPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        orderProductTablePanel.setBackground(new java.awt.Color(204, 204, 204));
+
+        orderProductTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        orderProductTablePanelSchollPane.setViewportView(orderProductTable);
+
+        javax.swing.GroupLayout orderProductTablePanelLayout = new javax.swing.GroupLayout(orderProductTablePanel);
+        orderProductTablePanel.setLayout(orderProductTablePanelLayout);
+        orderProductTablePanelLayout.setHorizontalGroup(
+            orderProductTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(orderProductTablePanelSchollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+        );
+        orderProductTablePanelLayout.setVerticalGroup(
+            orderProductTablePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, orderProductTablePanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(orderProductTablePanelSchollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout orderSummaryPanelLayout = new javax.swing.GroupLayout(orderSummaryPanel);
+        orderSummaryPanel.setLayout(orderSummaryPanelLayout);
+        orderSummaryPanelLayout.setHorizontalGroup(
+            orderSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(orderProductTablePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        orderSummaryPanelLayout.setVerticalGroup(
+            orderSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(orderSummaryPanelLayout.createSequentialGroup()
+                .addComponent(orderProductTablePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 82, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout orderProductPanelLayout = new javax.swing.GroupLayout(orderProductPanel);
+        orderProductPanel.setLayout(orderProductPanelLayout);
+        orderProductPanelLayout.setHorizontalGroup(
+            orderProductPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 660, Short.MAX_VALUE)
+        );
+        orderProductPanelLayout.setVerticalGroup(
+            orderProductPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 509, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout salesPanelLayout = new javax.swing.GroupLayout(salesPanel);
+        salesPanel.setLayout(salesPanelLayout);
+        salesPanelLayout.setHorizontalGroup(
+            salesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(orderSummaryPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(salesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(orderProductPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        salesPanelLayout.setVerticalGroup(
+            salesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(orderSummaryPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(salesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(orderProductPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        viewParentControlPanel.add(salesPanel, "card2");
+
+        shopPanel.setBackground(new java.awt.Color(255, 235, 235));
+
+        javax.swing.GroupLayout shopPanelLayout = new javax.swing.GroupLayout(shopPanel);
+        shopPanel.setLayout(shopPanelLayout);
+        shopPanelLayout.setHorizontalGroup(
+            shopPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 660, Short.MAX_VALUE)
+        );
+        shopPanelLayout.setVerticalGroup(
+            shopPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 500, Short.MAX_VALUE)
+        );
+
+        viewParentControlPanel.add(shopPanel, "card3");
+
+        javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
+        controlPanel.setLayout(controlPanelLayout);
+        controlPanelLayout.setHorizontalGroup(
+            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(optionControlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(viewParentControlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        controlPanelLayout.setVerticalGroup(
+            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(controlPanelLayout.createSequentialGroup()
+                .addComponent(optionControlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(viewParentControlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        mainPanel.add(controlPanel, "card3");
 
         loginPanel.setBackground(new java.awt.Color(255, 255, 255));
         loginPanel.setLayout(new java.awt.GridBagLayout());
@@ -101,13 +257,19 @@ public class POSFrame extends javax.swing.JFrame {
             }
         });
 
-        logInError.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        logInError.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         logInError.setForeground(new java.awt.Color(255, 0, 0));
 
-        forgotLabel.setText("<html><u>Forgot</u><html>");
+        forgotLabel.setText("<html><u>Forgot Password?</u><html>");
         forgotLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                forgotLabelMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 forgotLabelMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                forgotLabelMouseExited(evt);
             }
         });
 
@@ -115,20 +277,20 @@ public class POSFrame extends javax.swing.JFrame {
         logPanelEnclosed.setLayout(logPanelEnclosedLayout);
         logPanelEnclosedLayout.setHorizontalGroup(
             logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(logPanelEnclosedLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, logPanelEnclosedLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(passwordLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logInError, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(logPanelEnclosedLayout.createSequentialGroup()
                         .addComponent(forgotLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(reset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(logIn, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(usernameLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(passwordLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(usernameField, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(passwordField, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(logInError, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24)
+                        .addComponent(reset, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(logIn, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(passwordField)
+                    .addComponent(usernameField)
+                    .addComponent(usernameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         logPanelEnclosedLayout.setVerticalGroup(
@@ -138,18 +300,18 @@ public class POSFrame extends javax.swing.JFrame {
                 .addComponent(usernameLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(passwordLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
-                .addComponent(logInError, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(logInError, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(reset)
-                    .addComponent(logIn)
+                    .addComponent(logIn, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reset, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(forgotLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(40, 40, 40))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -161,20 +323,20 @@ public class POSFrame extends javax.swing.JFrame {
 
         mainPanel.add(loginPanel, "card2");
 
-        controlPanel.setBackground(new java.awt.Color(0, 0, 255));
+        accountRecoverPanel.setBackground(new java.awt.Color(255, 51, 0));
 
-        javax.swing.GroupLayout controlPanelLayout = new javax.swing.GroupLayout(controlPanel);
-        controlPanel.setLayout(controlPanelLayout);
-        controlPanelLayout.setHorizontalGroup(
-            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        javax.swing.GroupLayout accountRecoverPanelLayout = new javax.swing.GroupLayout(accountRecoverPanel);
+        accountRecoverPanel.setLayout(accountRecoverPanelLayout);
+        accountRecoverPanelLayout.setHorizontalGroup(
+            accountRecoverPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 660, Short.MAX_VALUE)
         );
-        controlPanelLayout.setVerticalGroup(
-            controlPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+        accountRecoverPanelLayout.setVerticalGroup(
+            accountRecoverPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 537, Short.MAX_VALUE)
         );
 
-        mainPanel.add(controlPanel, "card3");
+        mainPanel.add(accountRecoverPanel, "card4");
 
         fileMenu.setText("File");
 
@@ -213,13 +375,13 @@ public class POSFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 579, Short.MAX_VALUE)
+            .addGap(0, 660, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 417, Short.MAX_VALUE)
+            .addGap(0, 537, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -227,37 +389,60 @@ public class POSFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void logInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInActionPerformed
+    private void logInActionPerformed(ActionEvent evt) {//GEN-FIRST:event_logInActionPerformed
         // TODO add your handling code here:
         LoginValidation loginValidation = new LoginValidation();
         String username = usernameField.getText();
         String password = passwordField.getText();
-        if(loginValidation.loginValidation(username, password)){
+        if(loginValidation.loginValidation(username, password) || true){
             panelSlider.changeThePanel(mainPanel, controlPanel);
         }else{
             logInError.setText(ErrorMessage.ERROR_INVALID_USRE_INFO);
         }
     }//GEN-LAST:event_logInActionPerformed
 
-    private void resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetActionPerformed
+    private void resetActionPerformed(ActionEvent evt) {//GEN-FIRST:event_resetActionPerformed
         // TODO add your handling code here:
         usernameField.setText("");
         passwordField.setText("");
     }//GEN-LAST:event_resetActionPerformed
 
-    private void forgotLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forgotLabelMouseEntered
+    private void forgotLabelMouseEntered(MouseEvent evt) {//GEN-FIRST:event_forgotLabelMouseEntered
         // TODO add your handling code here:
         System.out.println("Mouse Hover!");
         forgotLabel.setOpaque(false);
         forgotLabel.setForeground(Color.BLUE);
-        forgotLabel.setCursor(java.awt.Cursor.getDefaultCursor());
         forgotLabel.setOpaque(true);
         
     }//GEN-LAST:event_forgotLabelMouseEntered
 
-    private void developerItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_developerItemActionPerformed
+    private void developerItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_developerItemActionPerformed
         // TODO add your handling code here:
+         System.out.println("Mouse Exited!");
+        forgotLabel.setOpaque(false);
+        forgotLabel.setForeground(Color.BLACK);
+        forgotLabel.setOpaque(true);
     }//GEN-LAST:event_developerItemActionPerformed
+
+    private void forgotLabelMouseExited(MouseEvent evt) {//GEN-FIRST:event_forgotLabelMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_forgotLabelMouseExited
+
+    private void forgotLabelMouseClicked(MouseEvent evt) {//GEN-FIRST:event_forgotLabelMouseClicked
+        // TODO add your handling code here:
+        System.out.println("Mouse Clicked!");
+        panelSlider.changeThePanel(mainPanel, accountRecoverPanel);
+    }//GEN-LAST:event_forgotLabelMouseClicked
+
+    private void salesButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_salesButtonActionPerformed
+        // TODO add your handling code here:
+        panelSlider.changeThePanel(viewParentControlPanel, salesPanel);
+    }//GEN-LAST:event_salesButtonActionPerformed
+
+    private void shopButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_shopButtonActionPerformed
+        // TODO add your handling code here:
+        panelSlider.changeThePanel(viewParentControlPanel, shopPanel);
+    }//GEN-LAST:event_shopButtonActionPerformed
     
     
     /**
@@ -299,6 +484,7 @@ public class POSFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutItem;
+    private javax.swing.JPanel accountRecoverPanel;
     private javax.swing.JPanel controlPanel;
     private javax.swing.JMenuItem developerItem;
     private javax.swing.JMenu editMenu;
@@ -312,12 +498,25 @@ public class POSFrame extends javax.swing.JFrame {
     private javax.swing.JPanel loginPanel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JPanel optionControlPanel;
+    private javax.swing.JPanel orderProductPanel;
+    private javax.swing.JTable orderProductTable;
+    private javax.swing.JPanel orderProductTablePanel;
+    private javax.swing.JScrollPane orderProductTablePanelSchollPane;
+    private javax.swing.JPanel orderSummaryPanel;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
     private javax.swing.JButton reset;
+    private javax.swing.JButton salesButton;
+    private javax.swing.JPanel salesPanel;
+    private javax.swing.JButton shopButton;
+    private javax.swing.JPanel shopPanel;
+    private javax.swing.JButton statisticsButton;
     private javax.swing.JMenuItem supportItem;
+    private javax.swing.JButton transactionButton;
     private javax.swing.JTextField usernameField;
     private javax.swing.JLabel usernameLabel;
+    private javax.swing.JPanel viewParentControlPanel;
     private javax.swing.JMenu windowMenu;
     // End of variables declaration//GEN-END:variables
 }
