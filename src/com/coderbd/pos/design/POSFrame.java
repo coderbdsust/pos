@@ -8,6 +8,8 @@ package com.coderbd.pos.design;
 
 import com.coderbd.pos.validation.ErrorMessage;
 import com.coderbd.pos.validation.LoginValidation;
+import java.awt.Color;
+import javafx.scene.Cursor;
 
 /**
  *
@@ -43,6 +45,7 @@ public class POSFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         mainPanel = new javax.swing.JPanel();
         loginPanel = new javax.swing.JPanel();
@@ -54,23 +57,27 @@ public class POSFrame extends javax.swing.JFrame {
         passwordField = new javax.swing.JPasswordField();
         logIn = new javax.swing.JButton();
         logInError = new javax.swing.JLabel();
+        forgotLabel = new javax.swing.JLabel();
         controlPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        exitItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
         windowMenu = new javax.swing.JMenu();
-        theme = new javax.swing.JMenu();
-        nimbus = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
+        supportItem = new javax.swing.JMenuItem();
+        developerItem = new javax.swing.JMenuItem();
+        aboutItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         mainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        mainPanel.setLayout(new java.awt.CardLayout());
 
         loginPanel.setBackground(new java.awt.Color(255, 255, 255));
+        loginPanel.setLayout(new java.awt.GridBagLayout());
 
-        logPanelEnclosed.setBackground(new java.awt.Color(255, 252, 240));
+        logPanelEnclosed.setBackground(new java.awt.Color(212, 237, 247));
 
         usernameLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         usernameLabel.setText("Username / Mobile Number");
@@ -80,6 +87,11 @@ public class POSFrame extends javax.swing.JFrame {
 
         reset.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         reset.setText("Reset");
+        reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetActionPerformed(evt);
+            }
+        });
 
         logIn.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         logIn.setText("Log In");
@@ -92,23 +104,31 @@ public class POSFrame extends javax.swing.JFrame {
         logInError.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         logInError.setForeground(new java.awt.Color(255, 0, 0));
 
+        forgotLabel.setText("<html><u>Forgot</u><html>");
+        forgotLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                forgotLabelMouseEntered(evt);
+            }
+        });
+
         javax.swing.GroupLayout logPanelEnclosedLayout = new javax.swing.GroupLayout(logPanelEnclosed);
         logPanelEnclosed.setLayout(logPanelEnclosedLayout);
         logPanelEnclosedLayout.setHorizontalGroup(
             logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(logPanelEnclosedLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(logPanelEnclosedLayout.createSequentialGroup()
+                        .addComponent(forgotLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(reset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(logIn, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(usernameLabel)
-                        .addComponent(passwordLabel)
-                        .addComponent(usernameField)
-                        .addComponent(passwordField)
-                        .addComponent(logInError, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(usernameLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(passwordLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(usernameField, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(passwordField, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(logInError, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         logPanelEnclosedLayout.setVerticalGroup(
@@ -117,8 +137,8 @@ public class POSFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(usernameLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -127,26 +147,19 @@ public class POSFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(logPanelEnclosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(reset)
-                    .addComponent(logIn))
+                    .addComponent(logIn)
+                    .addComponent(forgotLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout loginPanelLayout = new javax.swing.GroupLayout(loginPanel);
-        loginPanel.setLayout(loginPanelLayout);
-        loginPanelLayout.setHorizontalGroup(
-            loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loginPanelLayout.createSequentialGroup()
-                .addGap(182, 182, 182)
-                .addComponent(logPanelEnclosed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(177, Short.MAX_VALUE))
-        );
-        loginPanelLayout.setVerticalGroup(
-            loginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loginPanelLayout.createSequentialGroup()
-                .addGap(105, 105, 105)
-                .addComponent(logPanelEnclosed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(134, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(105, 182, 134, 177);
+        loginPanel.add(logPanelEnclosed, gridBagConstraints);
+
+        mainPanel.add(loginPanel, "card2");
 
         controlPanel.setBackground(new java.awt.Color(0, 0, 255));
 
@@ -161,46 +174,37 @@ public class POSFrame extends javax.swing.JFrame {
             .addGap(0, 279, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
-        mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 579, Short.MAX_VALUE)
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(loginPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 417, Short.MAX_VALUE)
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(loginPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(controlPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        mainPanel.add(controlPanel, "card3");
 
         fileMenu.setText("File");
+
+        exitItem.setText("Exit");
+        fileMenu.add(exitItem);
+
         menuBar.add(fileMenu);
 
         editMenu.setText("Edit");
         menuBar.add(editMenu);
 
         windowMenu.setText("Window");
-
-        theme.setText("Theme");
-
-        nimbus.setText("Nimbus");
-        theme.add(nimbus);
-
-        jMenuItem2.setText("Windows");
-        theme.add(jMenuItem2);
-
-        windowMenu.add(theme);
-
         menuBar.add(windowMenu);
 
         helpMenu.setText("Help");
+
+        supportItem.setText("Get Support");
+        helpMenu.add(supportItem);
+
+        developerItem.setText("Developer");
+        developerItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                developerItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(developerItem);
+
+        aboutItem.setText("About");
+        helpMenu.add(aboutItem);
+
         menuBar.add(helpMenu);
 
         setJMenuBar(menuBar);
@@ -231,9 +235,29 @@ public class POSFrame extends javax.swing.JFrame {
         if(loginValidation.loginValidation(username, password)){
             panelSlider.changeThePanel(mainPanel, controlPanel);
         }else{
-            logInError.setText(ErrorMessage.ERROR_VALID_USER);
+            logInError.setText(ErrorMessage.ERROR_INVALID_USRE_INFO);
         }
     }//GEN-LAST:event_logInActionPerformed
+
+    private void resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetActionPerformed
+        // TODO add your handling code here:
+        usernameField.setText("");
+        passwordField.setText("");
+    }//GEN-LAST:event_resetActionPerformed
+
+    private void forgotLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forgotLabelMouseEntered
+        // TODO add your handling code here:
+        System.out.println("Mouse Hover!");
+        forgotLabel.setOpaque(false);
+        forgotLabel.setForeground(Color.BLUE);
+        forgotLabel.setCursor(java.awt.Cursor.getDefaultCursor());
+        forgotLabel.setOpaque(true);
+        
+    }//GEN-LAST:event_forgotLabelMouseEntered
+
+    private void developerItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_developerItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_developerItemActionPerformed
     
     
     /**
@@ -247,7 +271,7 @@ public class POSFrame extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -274,22 +298,24 @@ public class POSFrame extends javax.swing.JFrame {
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutItem;
     private javax.swing.JPanel controlPanel;
+    private javax.swing.JMenuItem developerItem;
     private javax.swing.JMenu editMenu;
+    private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JLabel forgotLabel;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JButton logIn;
     private javax.swing.JLabel logInError;
     private javax.swing.JPanel logPanelEnclosed;
     private javax.swing.JPanel loginPanel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
-    private javax.swing.JMenuItem nimbus;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
     private javax.swing.JButton reset;
-    private javax.swing.JMenu theme;
+    private javax.swing.JMenuItem supportItem;
     private javax.swing.JTextField usernameField;
     private javax.swing.JLabel usernameLabel;
     private javax.swing.JMenu windowMenu;

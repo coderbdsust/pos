@@ -14,7 +14,7 @@ public class ErrorMessage {
     
     public static String ERROR_USERNAME="CHECK THE USERNAME!";
     public static String ERROR_PASSWORD="CHECK THE PASSWORD!";
-    public static String ERROR_VALID_USER="INVALID USER ACCOUNT!";
+    public static String ERROR_INVALID_USRE_INFO="INVALID USERNAME/PASSWORD";
     
     
     
