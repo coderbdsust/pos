@@ -111,6 +111,8 @@ public class POSFrame extends javax.swing.JFrame {
         orderViewTablePanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        managerTab = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         shopStockTab = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
@@ -129,8 +131,6 @@ public class POSFrame extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        managerTab = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
         shopAccountPanel = new javax.swing.JPanel();
         staffPanel = new javax.swing.JPanel();
         barcodeGenerationPanel = new javax.swing.JPanel();
@@ -618,6 +618,11 @@ public class POSFrame extends javax.swing.JFrame {
 
         tabPanelContainer.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=30 marginheight=3>Customer Order</body></html>", customerOrderTab);
 
+        managerTab.setBackground(new java.awt.Color(255, 255, 255));
+        managerTab.setLayout(new java.awt.CardLayout());
+
+        jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
         shopStockTab.setBackground(new java.awt.Color(51, 204, 255));
         shopStockTab.setLayout(new java.awt.BorderLayout());
 
@@ -657,7 +662,7 @@ public class POSFrame extends javax.swing.JFrame {
                     .addComponent(jTextField18)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField17, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                            .addComponent(jTextField17, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
                             .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -730,12 +735,7 @@ public class POSFrame extends javax.swing.JFrame {
 
         shopStockTab.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        tabPanelContainer.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=30 marginheight=3>Shop Stock</body></html>", shopStockTab);
-
-        managerTab.setBackground(new java.awt.Color(255, 255, 255));
-        managerTab.setLayout(new java.awt.CardLayout());
-
-        jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTabbedPane1.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=30 marginheight=3>Shop Stock</body></html>", shopStockTab);
 
         javax.swing.GroupLayout shopAccountPanelLayout = new javax.swing.GroupLayout(shopAccountPanel);
         shopAccountPanel.setLayout(shopAccountPanelLayout);
@@ -846,7 +846,7 @@ public class POSFrame extends javax.swing.JFrame {
 
         barcodeGenerationPanel.add(jPanel3);
 
-        jTabbedPane1.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Barcode Generation</body></html>", barcodeGenerationPanel);
+        jTabbedPane1.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Product Barcode Generation</body></html>", barcodeGenerationPanel);
 
         managerTab.add(jTabbedPane1, "card2");
 
