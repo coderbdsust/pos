@@ -8,6 +8,7 @@ package com.coderbd.pos.barutils.main;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 /**
  *
@@ -19,6 +20,12 @@ public class IDBuilder {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmssSSS");
         String uniqueID = dateFormat.format(new Date());
         return uniqueID;
+    }
+
+    public int randomID(int minRange, int maxRange) {
+        Random random = new Random();
+        int randomValue = random.nextInt(maxRange - minRange) + minRange;
+        return randomValue;
     }
 
 }
