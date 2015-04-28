@@ -16,7 +16,7 @@ import java.util.Random;
  */
 public class IDBuilder {
 
-    public String getUniqueID() {
+    public String getUniqueTimeStampID() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmssSSS");
         String uniqueID = dateFormat.format(new Date());
         return uniqueID;
