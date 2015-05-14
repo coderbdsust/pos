@@ -7,11 +7,14 @@
 package com.coderbd.pos.entity;
 
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Biswajit Debnath
  */
+
+
 public class User {
     
     private int userId;
@@ -27,6 +30,15 @@ public class User {
 
     public User(int userId, String username, String password, String name, String mobile, String authority, boolean active) {
         this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.mobile = mobile;
+        this.authority = authority;
+        this.active = active;
+    }
+    
+    public User( String username, String password, String name, String mobile, String authority, boolean active) {
         this.username = username;
         this.password = password;
         this.name = name;

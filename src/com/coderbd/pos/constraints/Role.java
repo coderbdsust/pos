@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package com.coderbd.pos.entity;
+package com.coderbd.pos.constraints;
 
 /**
  *
  * @author Biswajit Debnath
  */
-public class CustomerOrderProduct {
-   
-    
+public class Role {
+
+    public static String USER_DEVELOPER = "DEVELOPER";
+    public static String USER_MANAGER = "MANAGER";
+    public static String USER_STAFF = "STAFF";
+
 }

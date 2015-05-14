@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.coderbd.pos.entity;
 
 /**
@@ -11,6 +10,7 @@ package com.coderbd.pos.entity;
  * @author Biswajit Debnath
  */
 public class Shop {
+
     private int shopId;
     private String shopName;
     private String shopTin;
@@ -19,11 +19,16 @@ public class Shop {
 
     public Shop() {
     }
-    
-    
 
     public Shop(int shopId, String shopName, String shopTin, String shopAddress, String shopMobile) {
         this.shopId = shopId;
+        this.shopName = shopName;
+        this.shopTin = shopTin;
+        this.shopAddress = shopAddress;
+        this.shopMobile = shopMobile;
+    }
+
+    public Shop(String shopName, String shopTin, String shopAddress, String shopMobile) {
         this.shopName = shopName;
         this.shopTin = shopTin;
         this.shopAddress = shopAddress;
@@ -74,10 +79,5 @@ public class Shop {
     public String toString() {
         return "Shop{" + "shopId=" + shopId + ", shopName=" + shopName + ", shopTin=" + shopTin + ", shopAddress=" + shopAddress + ", shopMobile=" + shopMobile + '}';
     }
-    
-    
-    
-    
-    
-    
+
 }

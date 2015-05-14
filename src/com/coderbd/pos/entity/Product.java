@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.coderbd.pos.entity;
 
 import java.sql.Timestamp;
@@ -13,7 +12,7 @@ import java.sql.Timestamp;
  * @author Biswajit Debnath
  */
 public class Product {
-    
+
     private int productId;
     private int shopId;
     private String productBarcode;
@@ -21,8 +20,26 @@ public class Product {
     private double productRate;
     private Timestamp productInfoUpdated;
     private int productStock;
-    
-    public Product(){
+
+    public Product() {
+    }
+
+    public Product(int shopId, String productBarcode, String productName, int productStock, double productRate) {
+        this.shopId = shopId;
+        this.productBarcode = productBarcode;
+        this.productName = productName;
+        this.productRate = productRate;
+        this.productInfoUpdated = productInfoUpdated;
+        this.productStock = productStock;
+    }
+
+    public Product(int shopId, String productBarcode, String productName, int productStock, double productRate, Timestamp productInfoUpdated) {
+        this.shopId = shopId;
+        this.productBarcode = productBarcode;
+        this.productName = productName;
+        this.productRate = productRate;
+        this.productInfoUpdated = productInfoUpdated;
+        this.productStock = productStock;
     }
 
     public Product(int productId, int shopId, String productBarcode, String productName, double productRate, Timestamp productInfoUpdated, int productStock) {
@@ -95,9 +112,5 @@ public class Product {
     public String toString() {
         return "Product{" + "productId=" + productId + ", shopId=" + shopId + ", productBarcode=" + productBarcode + ", productName=" + productName + ", productRate=" + productRate + ", productInfoUpdated=" + productInfoUpdated + ", productStock=" + productStock + '}';
     }
-    
-    
-    
-    
-    
+
 }
