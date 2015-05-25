@@ -7,3 +7,5 @@ dist
 bin
 build
 classes
+GenratedBarcode
+GenratedBill
