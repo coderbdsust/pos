@@ -47,7 +47,8 @@ public class ProductsDao {
                     product.setShopId(rs.getInt("shop_id"));
                     product.setProductBarcode(rs.getString("product_barcode"));
                     product.setProductName(rs.getString("product_name"));
-                    product.setProductRate(rs.getDouble("product_rate"));
+                    product.setProductBuyRate(rs.getDouble("product_buy_rate"));
+                    product.setProductSellRate(rs.getDouble("product_sell_rate"));
                     product.setProductInfoUpdated(rs.getTimestamp("product_info_updated"));
                     product.setProductStock(rs.getInt("product_stock"));
                     return product;
@@ -76,7 +77,8 @@ public class ProductsDao {
                     product.setShopId(rs.getInt("shop_id"));
                     product.setProductBarcode(rs.getString("product_barcode"));
                     product.setProductName(rs.getString("product_name"));
-                    product.setProductRate(rs.getDouble("product_rate"));
+                    product.setProductBuyRate(rs.getDouble("product_buy_rate"));
+                    product.setProductSellRate(rs.getDouble("product_sell_rate"));
                     product.setProductInfoUpdated(rs.getTimestamp("product_info_updated"));
                     product.setProductStock(rs.getInt("product_stock"));
                     return product;
@@ -105,7 +107,8 @@ public class ProductsDao {
                             product.setShopId(rs.getInt("shop_id"));
                             product.setProductBarcode(rs.getString("product_barcode"));
                             product.setProductName(rs.getString("product_name"));
-                            product.setProductRate(rs.getDouble("product_rate"));
+                            product.setProductBuyRate(rs.getDouble("product_buy_rate"));
+                            product.setProductSellRate(rs.getDouble("product_sell_rate"));
                             product.setProductInfoUpdated(rs.getTimestamp("product_info_updated"));
                             product.setProductStock(rs.getInt("product_stock"));
                             return product;
@@ -126,14 +129,15 @@ public class ProductsDao {
         params.addValue("shop_id", product.getShopId());
         params.addValue("product_barcode", product.getProductBarcode());
         params.addValue("product_name", product.getProductName());
-        params.addValue("product_rate", product.getProductRate());
+        params.addValue("product_buy_rate", product.getProductBuyRate());
+        params.addValue("product_sell_rate", product.getProductSellRate());
         params.addValue("product_info_updated", product.getProductInfoUpdated());
         params.addValue("product_stock", product.getProductStock());
 
         try {
-            jdbc.update("insert into pos.products (shop_id, product_barcode, product_name, product_rate, "
+            jdbc.update("insert into pos.products (shop_id, product_barcode, product_name, product_buy_rate, product_sell_rate,"
                     + "product_info_updated, product_stock) values(:shop_id, :product_barcode, "
-                    + ":product_name, :product_rate, now(), :product_stock)", params);
+                    + ":product_name, :product_buy_rate,:product_sell_rate, NOW(), :product_stock)", params);
             return true;
         } catch (CannotGetJdbcConnectionException conExp) {
             System.out.println(conExp.getMessage());
@@ -151,12 +155,33 @@ public class ProductsDao {
         params.addValue("shop_id", product.getShopId());
         params.addValue("product_barcode", product.getProductBarcode());
         params.addValue("product_name", product.getProductName());
-        params.addValue("product_rate", product.getProductRate());
-        params.addValue("product_info_updated", product.getProductInfoUpdated());
+        params.addValue("product_buy_rate", product.getProductBuyRate());
+        params.addValue("product_sell_rate", product.getProductSellRate());
         params.addValue("product_stock", product.getProductStock());
 
         try {
-            jdbc.update("update pos.products set product_stock=:product_stock , product_name=:product_name , product_rate=:product_rate where (product_id=:product_id and shop_id=:shop_id) or (product_barcode=:product_barcode and shop_id=:shop_id)", params);
+            jdbc.update("update pos.products set product_stock=:product_stock , product_name=:product_name ,"
+                    + " product_buy_rate=:product_buy_rate, product_sell_rate=:product_sell_rate,"
+                    + " product_info_updated=NOW() "
+                    + "where (product_id=:product_id and shop_id=:shop_id) or (product_barcode=:product_barcode and shop_id=:shop_id)", params);
+            return true;
+        } catch (CannotGetJdbcConnectionException conExp) {
+            System.out.println(conExp.getMessage());
+            return false;
+        } catch (DataAccessException dae) {
+            System.out.println(dae.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateProductStock(int productId, int soldStock) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("product_id", productId);
+        params.addValue("sold_stock", soldStock);
+
+        try {
+            jdbc.update("update pos.products set product_stock=product_stock-:sold_stock "
+                    + "where product_id=:product_id", params);
             return true;
         } catch (CannotGetJdbcConnectionException conExp) {
             System.out.println(conExp.getMessage());
@@ -186,7 +211,7 @@ public class ProductsDao {
     public boolean deleteProductById(int productId) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("product_id", productId);
-        
+
         try {
             jdbc.update("delete from pos.products where product_id=:product_id", params);
             return true;

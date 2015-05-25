@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.coderbd.pos.entity;
 
 import java.util.Objects;
@@ -13,10 +12,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Biswajit Debnath
  */
-
-
 public class User {
-    
+
     private int userId;
     private String username;
     private String password;
@@ -24,8 +21,8 @@ public class User {
     private String mobile;
     private String authority;
     private boolean active;
-    
-    public User(){
+
+    public User() {
     }
 
     public User(int userId, String username, String password, String name, String mobile, String authority, boolean active) {
@@ -37,8 +34,8 @@ public class User {
         this.authority = authority;
         this.active = active;
     }
-    
-    public User( String username, String password, String name, String mobile, String authority, boolean active) {
+
+    public User(String username, String password, String name, String mobile, String authority, boolean active) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -153,13 +150,5 @@ public class User {
         }
         return true;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
 }

@@ -5,6 +5,7 @@
  */
 package com.coderbd.pos.pdf;
 
+import com.coderbd.pos.utils.DirectoryCreator;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -38,6 +39,8 @@ import java.io.UnsupportedEncodingException;
  */
 public class BarcodePdf {
 
+    private DirectoryCreator directoryCreator;
+    private String directory = "GenratedBarcode";
     private int barcodeQuantity;
     private String barcodeData;
     private double productRate = 150;
@@ -45,6 +48,8 @@ public class BarcodePdf {
     public BarcodePdf(int barcodeQuantity, String barcodeData) {
         this.barcodeQuantity = barcodeQuantity;
         this.barcodeData = barcodeData;
+        directoryCreator = new DirectoryCreator();
+        directoryCreator.makeDir(directory);
     }
 
     public int getBarcodeQuantity() {
@@ -65,7 +70,7 @@ public class BarcodePdf {
 
     public void generateBarcodePdf() throws UnsupportedEncodingException {
         try {
-            String filename = barcodeData + ".pdf";
+            String filename = directory + "\\" + barcodeData + ".pdf";
             Document document = new Document(PageSize.A4);
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
             document.open();
@@ -79,7 +84,7 @@ public class BarcodePdf {
             PdfPTable pdfPTable = new PdfPTable(3);
             float[] widths = {0.45f, .10f, .45f};
             pdfPTable.setWidths(widths);
-            
+
             for (int i = 0; i < barcodeQuantity; i++) {
                 Image image = code25.createImageWithBarcode(cb, null, null);
 

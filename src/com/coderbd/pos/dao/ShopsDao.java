@@ -7,6 +7,7 @@ package com.coderbd.pos.dao;
 
 import com.coderbd.pos.entity.Shop;
 import com.coderbd.pos.entity.User;
+import com.coderbd.pos.entity.pojo.ShopDailyProfit;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -114,6 +115,56 @@ public class ShopsDao {
                             shop.setShopAddress(rs.getString("shop_address"));
                             shop.setShopMobile(rs.getString("shop_mobile"));
                             return shop;
+                        }
+
+                    });
+
+        } catch (CannotGetJdbcConnectionException conExp) {
+            System.out.println(conExp.getMessage());
+            return null;
+        } catch (DataAccessException dae) {
+            System.out.println(dae.getMessage());
+            return null;
+        }
+    }
+
+    public List<ShopDailyProfit> getShopDailyProfits(Shop shop) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("shop_id", shop.getShopId());
+
+        try {
+            return jdbc.query("select  shop_id, date, \n"
+                    + "sum(total_amount) as daily_sell, \n"
+                    + "sum(total_paid) as daily_paid, \n"
+                    + "sum(total_due) as daily_due, \n"
+                    + "sum(order_profit) as daily_profit from (select shop_id,\n"
+                    + "customer_order_id,\n"
+                    + "order_barcode, \n"
+                    + "date(order_time) as date, \n"
+                    + "total_amount, \n"
+                    + "total_paid, \n"
+                    + "total_due, \n"
+                    + "(sum(profit)-total_due) as order_profit from \n"
+                    + "\n"
+                    + "(select \n"
+                    + "customer_order_id, product_id,\n"
+                    + "(order_product_sell_rate\n"
+                    + "-order_product_discount*0.01\n"
+                    + "+order_product_vat*0.01 \n"
+                    + "- product_buy_rate) * order_product_quantity\n"
+                    + "as profit from products natural join order_products order by customer_order_id ) \n"
+                    + "as profit_table join customer_orders  using(customer_order_id) \n"
+                    + "group by customer_order_id) as shop_profit where shop_id=:shop_id group by date", params, new RowMapper<ShopDailyProfit>() {
+                        @Override
+                        public ShopDailyProfit mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            ShopDailyProfit sdp = new ShopDailyProfit();
+                            sdp.setDate(rs.getDate("date"));
+                            sdp.setShopId(rs.getInt("shop_id"));
+                            sdp.setDailySell(rs.getDouble("daily_sell"));
+                            sdp.setDailyPaid(rs.getDouble("daily_paid"));
+                            sdp.setDailyDue(rs.getDouble("daily_due"));
+                            sdp.setDailyProfit(rs.getDouble("daily_profit"));
+                            return sdp;
                         }
 
                     });

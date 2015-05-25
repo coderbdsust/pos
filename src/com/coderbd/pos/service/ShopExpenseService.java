@@ -10,7 +10,7 @@ import com.coderbd.pos.dao.ExpenseCategoriesDao;
 import com.coderbd.pos.entity.Expenditure;
 import com.coderbd.pos.entity.ExpenseCategory;
 import com.coderbd.pos.entity.Shop;
-import com.coderbd.pos.utils.ShopExpense;
+import com.coderbd.pos.entity.pojo.ShopExpense;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,16 +49,16 @@ public class ShopExpenseService {
     public ExpenseCategory getExpenseCategory(int shopId, String expName) {
         return expCategoriesDao.getExpenseCategory(shopId, expName);
     }
-    
-    public boolean saveExpenditure(Expenditure expenditure){
-       return expendituresDao.createExpenditure(expenditure);
+
+    public boolean saveExpenditure(Expenditure expenditure) {
+        return expendituresDao.createExpenditure(expenditure);
     }
-    
-    public List<Expenditure> getExpenditures(ExpenseCategory expCategory){
+
+    public List<Expenditure> getExpenditures(ExpenseCategory expCategory) {
         return expendituresDao.getExpenditures(expCategory);
     }
-    
-    public boolean deleteExpenditure(Expenditure expenditure){
+
+    public boolean deleteExpenditure(Expenditure expenditure) {
         return expendituresDao.deleteExpenditure(expenditure);
     }
 }

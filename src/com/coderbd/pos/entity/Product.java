@@ -6,6 +6,7 @@
 package com.coderbd.pos.entity;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 /**
  *
@@ -17,37 +18,42 @@ public class Product {
     private int shopId;
     private String productBarcode;
     private String productName;
-    private double productRate;
+    private double productBuyRate;
+    private double productSellRate;
     private Timestamp productInfoUpdated;
     private int productStock;
 
     public Product() {
     }
 
-    public Product(int shopId, String productBarcode, String productName, int productStock, double productRate) {
+    public Product(int shopId, String productBarcode, String productName, double productBuyRate, double productSellRate, int productStock) {
+
         this.shopId = shopId;
         this.productBarcode = productBarcode;
         this.productName = productName;
-        this.productRate = productRate;
+        this.productBuyRate = productBuyRate;
+        this.productSellRate = productSellRate;
+        this.productStock = productStock;
+    }
+
+    public Product(int shopId, String productBarcode, String productName, double productBuyRate, double productSellRate, Timestamp productInfoUpdated, int productStock) {
+
+        this.shopId = shopId;
+        this.productBarcode = productBarcode;
+        this.productName = productName;
+        this.productBuyRate = productBuyRate;
+        this.productSellRate = productSellRate;
         this.productInfoUpdated = productInfoUpdated;
         this.productStock = productStock;
     }
 
-    public Product(int shopId, String productBarcode, String productName, int productStock, double productRate, Timestamp productInfoUpdated) {
-        this.shopId = shopId;
-        this.productBarcode = productBarcode;
-        this.productName = productName;
-        this.productRate = productRate;
-        this.productInfoUpdated = productInfoUpdated;
-        this.productStock = productStock;
-    }
-
-    public Product(int productId, int shopId, String productBarcode, String productName, double productRate, Timestamp productInfoUpdated, int productStock) {
+    public Product(int productId, int shopId, String productBarcode, String productName, double productBuyRate, double productSellRate, Timestamp productInfoUpdated, int productStock) {
         this.productId = productId;
         this.shopId = shopId;
         this.productBarcode = productBarcode;
         this.productName = productName;
-        this.productRate = productRate;
+        this.productBuyRate = productBuyRate;
+        this.productSellRate = productSellRate;
         this.productInfoUpdated = productInfoUpdated;
         this.productStock = productStock;
     }
@@ -84,12 +90,20 @@ public class Product {
         this.productName = productName;
     }
 
-    public double getProductRate() {
-        return productRate;
+    public double getProductBuyRate() {
+        return productBuyRate;
     }
 
-    public void setProductRate(double productRate) {
-        this.productRate = productRate;
+    public void setProductBuyRate(double productBuyRate) {
+        this.productBuyRate = productBuyRate;
+    }
+
+    public double getProductSellRate() {
+        return productSellRate;
+    }
+
+    public void setProductSellRate(double productSellRate) {
+        this.productSellRate = productSellRate;
     }
 
     public Timestamp getProductInfoUpdated() {
@@ -109,8 +123,58 @@ public class Product {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 61 * hash + this.productId;
+        hash = 61 * hash + this.shopId;
+        hash = 61 * hash + Objects.hashCode(this.productBarcode);
+        hash = 61 * hash + Objects.hashCode(this.productName);
+        hash = 61 * hash + (int) (Double.doubleToLongBits(this.productBuyRate) ^ (Double.doubleToLongBits(this.productBuyRate) >>> 32));
+        hash = 61 * hash + (int) (Double.doubleToLongBits(this.productSellRate) ^ (Double.doubleToLongBits(this.productSellRate) >>> 32));
+        hash = 61 * hash + Objects.hashCode(this.productInfoUpdated);
+        hash = 61 * hash + this.productStock;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Product other = (Product) obj;
+        if (this.productId != other.productId) {
+            return false;
+        }
+        if (this.shopId != other.shopId) {
+            return false;
+        }
+        if (!Objects.equals(this.productBarcode, other.productBarcode)) {
+            return false;
+        }
+        if (!Objects.equals(this.productName, other.productName)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.productBuyRate) != Double.doubleToLongBits(other.productBuyRate)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.productSellRate) != Double.doubleToLongBits(other.productSellRate)) {
+            return false;
+        }
+        if (!Objects.equals(this.productInfoUpdated, other.productInfoUpdated)) {
+            return false;
+        }
+        if (this.productStock != other.productStock) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
-        return "Product{" + "productId=" + productId + ", shopId=" + shopId + ", productBarcode=" + productBarcode + ", productName=" + productName + ", productRate=" + productRate + ", productInfoUpdated=" + productInfoUpdated + ", productStock=" + productStock + '}';
+        return "Product{" + "productId=" + productId + ", shopId=" + shopId + ", productBarcode=" + productBarcode + ", productName=" + productName + ", productBuyRate=" + productBuyRate + ", productSellRate=" + productSellRate + ", productInfoUpdated=" + productInfoUpdated + ", productStock=" + productStock + '}';
     }
 
 }

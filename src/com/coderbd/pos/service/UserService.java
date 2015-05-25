@@ -17,24 +17,24 @@ import org.springframework.stereotype.Service;
  */
 @Service("userService")
 public class UserService {
-    
+
     @Autowired
     private UsersDao usersDao;
-    
+
     public User getUser(String username, String password) {
         return usersDao.getUser(username, password);
     }
-    
-    public User getUser(String usernameOrMobile){
+
+    public User getUser(String usernameOrMobile) {
         return usersDao.getUser(usernameOrMobile);
     }
-    
-    public boolean createUser(User user){
+
+    public boolean createUser(User user) {
         return usersDao.createUser(user);
     }
 
     public List<User> getUsers(String authority) {
-       return usersDao.getUsers(authority);
+        return usersDao.getUsers(authority);
     }
 
 }

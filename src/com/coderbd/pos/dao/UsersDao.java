@@ -43,7 +43,7 @@ public class UsersDao {
 
         try {
             return jdbc.queryForObject("select * from pos.users where "
-                    + "(username=:usernameOrMobileNumber || mobile=:usernameOrMobileNumber) and password=:password", params, new RowMapper<User>() {
+                    + "(username=:usernameOrMobileNumber or mobile=:usernameOrMobileNumber) and password=:password", params, new RowMapper<User>() {
                         @Override
                         public User mapRow(ResultSet rs, int i) throws SQLException {
                             User user = new User();
@@ -71,7 +71,7 @@ public class UsersDao {
         params.addValue("usernameOrMobileNumber", usernameOrMobileNumber);
         try {
             return jdbc.queryForObject("select * from pos.users where "
-                    + "(username=:usernameOrMobileNumber || mobile=:usernameOrMobileNumber)", params, new RowMapper<User>() {
+                    + "(username=:usernameOrMobileNumber or mobile=:usernameOrMobileNumber)", params, new RowMapper<User>() {
                         @Override
                         public User mapRow(ResultSet rs, int i) throws SQLException {
                             User user = new User();

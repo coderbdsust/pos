@@ -15,6 +15,7 @@ import java.util.Set;
  * @author Biswajit Debnath
  */
 public class CustomerOrder {
+
     private int customerOrderId;
     private String orderBarcode;
     private Timestamp orderTime;
@@ -25,8 +26,8 @@ public class CustomerOrder {
     private double totalAmount;
     private double totalPaid;
     private double totalDue;
-    
-    public CustomerOrder(){
+
+    public CustomerOrder() {
     }
 
     public CustomerOrder(String orderBarcode, Timestamp orderTime, Shop shop, User user) {
@@ -191,7 +192,23 @@ public class CustomerOrder {
         }
         return true;
     }
-    
-    
+
+    public static CustomerOrder copy(CustomerOrder co) {
+
+        CustomerOrder newCO = new CustomerOrder();
+
+        newCO.setBuyerMobile(co.getBuyerMobile());
+        newCO.setBuyerName(co.getBuyerName());
+        newCO.setCustomerOrderId(co.getCustomerOrderId());
+        newCO.setOrderBarcode(co.getOrderBarcode());
+        newCO.setOrderTime(co.getOrderTime());
+        newCO.setShop(co.getShop());
+        newCO.setTotalAmount(co.getTotalAmount());
+        newCO.setTotalDue(co.getTotalDue());
+        newCO.setTotalPaid(co.getTotalPaid());
+        newCO.setUser(co.getUser());
+
+        return newCO;
+    }
 
 }
