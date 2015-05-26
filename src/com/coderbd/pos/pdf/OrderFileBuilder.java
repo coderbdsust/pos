@@ -5,9 +5,10 @@
  */
 package com.coderbd.pos.pdf;
 
+import com.coderbd.pos.entity.Shop;
+import com.coderbd.pos.entity.pojo.ShopOrder;
 import com.coderbd.pos.utils.DirectoryCreator;
 import com.coderbd.pos.utils.ReceiptIndent;
-import com.coderbd.pos.entity.pojo.ShopOrder;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
@@ -35,6 +36,13 @@ public class OrderFileBuilder {
     public OrderFileBuilder() {
         directoryCreator = new DirectoryCreator();
         directoryCreator.makeDir(directory);
+        receipt = new ReceiptIndent();
+    }
+
+    public OrderFileBuilder(Shop shop) {
+        directoryCreator = new DirectoryCreator();
+        directory = shop.getShopName() + "\\" + directory;
+        directoryCreator.makeDirs(directory);
         receipt = new ReceiptIndent();
     }
 

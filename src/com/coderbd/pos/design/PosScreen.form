@@ -1139,7 +1139,7 @@
                                 <Container class="javax.swing.JPanel" name="stockInputPanel">
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[758, 80]"/>
+                                      <Dimension value="[758, 90]"/>
                                     </Property>
                                   </Properties>
                                   <Constraints>
@@ -1153,44 +1153,51 @@
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" alignment="0" attributes="0">
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jLabel14" min="-2" pref="100" max="-2" attributes="0"/>
-                                                  <Component id="psCodeField" min="-2" pref="119" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="psNameField" min="-2" pref="170" max="-2" attributes="0"/>
-                                                  <Component id="jLabel19" min="-2" pref="110" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jLabel20" min="-2" pref="60" max="-2" attributes="0"/>
-                                                  <Component id="psQuantityField" min="-2" pref="80" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="psBuyRateField" min="-2" pref="104" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
+                                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                                  <Component id="showProductButton" max="32767" attributes="0"/>
                                                   <Group type="102" attributes="0">
-                                                      <Component id="psSellRateField" min="-2" pref="120" max="-2" attributes="0"/>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Component id="jButton9" min="-2" pref="97" max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="1" attributes="0">
+                                                          <Component id="jLabel14" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                                                          <Component id="psCodeField" alignment="1" min="-2" pref="119" max="-2" attributes="0"/>
+                                                      </Group>
                                                       <EmptySpace max="-2" attributes="0"/>
-                                                      <Component id="jButton10" min="-2" max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" attributes="0">
+                                                          <Component id="psNameField" min="-2" pref="170" max="-2" attributes="0"/>
+                                                          <Component id="jLabel19" min="-2" pref="110" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <EmptySpace max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" attributes="0">
+                                                          <Component id="jLabel20" min="-2" pref="60" max="-2" attributes="0"/>
+                                                          <Component id="psQuantityField" min="-2" pref="80" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <EmptySpace max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" attributes="0">
+                                                          <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
+                                                          <Component id="psBuyRateField" min="-2" pref="104" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <EmptySpace max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" attributes="0">
+                                                          <Group type="102" alignment="0" attributes="0">
+                                                              <Component id="jLabel25" min="-2" max="-2" attributes="0"/>
+                                                              <EmptySpace min="109" pref="274" max="32767" attributes="0"/>
+                                                          </Group>
+                                                          <Group type="102" alignment="0" attributes="0">
+                                                              <Component id="psSellRateField" min="-2" pref="120" max="-2" attributes="0"/>
+                                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                              <Component id="jButton9" min="-2" pref="97" max="-2" attributes="0"/>
+                                                              <EmptySpace max="-2" attributes="0"/>
+                                                              <Component id="jButton10" max="32767" attributes="0"/>
+                                                          </Group>
+                                                      </Group>
                                                   </Group>
-                                                  <Component id="jLabel25" min="-2" max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace pref="36" max="32767" attributes="0"/>
+                                              <EmptySpace max="32767" attributes="0"/>
                                           </Group>
                                       </Group>
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="3" attributes="0">
                                                   <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
                                                   <Component id="jLabel19" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -1208,7 +1215,9 @@
                                                   <Component id="jButton10" alignment="3" min="-2" max="-2" attributes="0"/>
                                                   <Component id="psSellRateField" alignment="3" min="-2" max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace pref="26" max="32767" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="showProductButton" min="-2" pref="34" max="-2" attributes="0"/>
+                                              <EmptySpace max="32767" attributes="0"/>
                                           </Group>
                                       </Group>
                                     </DimensionLayout>
@@ -1279,6 +1288,17 @@
                                         </Property>
                                         <Property name="text" type="java.lang.String" value="Sell Rate (Unit)"/>
                                       </Properties>
+                                    </Component>
+                                    <Component class="javax.swing.JButton" name="showProductButton">
+                                      <Properties>
+                                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                                          <Font name="Tahoma" size="12" style="1"/>
+                                        </Property>
+                                        <Property name="text" type="java.lang.String" value="Show Details"/>
+                                      </Properties>
+                                      <Events>
+                                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showProductButtonActionPerformed"/>
+                                      </Events>
                                     </Component>
                                   </SubComponents>
                                 </Container>

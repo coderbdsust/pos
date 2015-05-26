@@ -5,6 +5,7 @@
  */
 package com.coderbd.pos.pdf;
 
+import com.coderbd.pos.entity.Shop;
 import com.coderbd.pos.utils.DirectoryCreator;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -50,6 +51,14 @@ public class BarcodePdf {
         this.barcodeData = barcodeData;
         directoryCreator = new DirectoryCreator();
         directoryCreator.makeDir(directory);
+    }
+
+    public BarcodePdf(int barcodeQuantity, String barcodeData, Shop shop) {
+        this.barcodeQuantity = barcodeQuantity;
+        this.barcodeData = barcodeData;
+        directoryCreator = new DirectoryCreator();
+        directory = shop.getShopName() + "\\" + directory;
+        directoryCreator.makeDirs(directory);
     }
 
     public int getBarcodeQuantity() {

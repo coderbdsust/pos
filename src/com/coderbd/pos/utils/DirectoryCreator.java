@@ -34,4 +34,25 @@ public class DirectoryCreator {
         }
     }
 
+    public void makeDirs(String directory) {
+        File theDir = new File(directory);
+
+        if (!theDir.exists()) {
+            System.out.println("creating directory: " + directory);
+            boolean result = false;
+            
+            try {
+                theDir.mkdirs();
+                System.out.println("Directory Created!");
+            } catch (SecurityException se) {
+                System.out.println(se.getMessage());
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+
+        } else {
+            System.out.println(directory + " Already Created!");
+        }
+    }
+
 }

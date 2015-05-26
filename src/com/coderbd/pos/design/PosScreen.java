@@ -67,25 +67,25 @@ public class PosScreen extends javax.swing.JFrame {
      * Creates new form PosScreen
      */
     private ApplicationContext appContext;
-    
+
     private UserService userService;
     private ShopService shopService;
     private ShopOwnerService shopOwnerService;
     private ProductService productService;
     private ShopExpenseService shopExpenseService;
     private CustomerOrderService customerOrderService;
-    
+
     private DeveloperHelper devHelper;
     private ManagerHelper manHelper;
     private StaffHelper staffHelper;
     private ResetTable resetTable;
-    
+
     private PanelSlider panelSlider;
     private Valid loginValidation;
     private ProductAdder productAdder;
     private OrderProductAdder orderProductAdder;
     private SellReportAdder sellReportAdder;
-    
+
     private ExpenseAdder expenseAdder;
     private ShopOrderAdder shopOrderAdder;
     private IDBuilder idBuilder;
@@ -106,10 +106,10 @@ public class PosScreen extends javax.swing.JFrame {
     private Shop shop;
     /*Customer Shop Order Object*/
     private ShopOrder shopOrder;
-    
+
     private Search search;
     private PrinterLookUp printerLookUp;
-    
+
     public PosScreen() {
         initComponents();
         /**
@@ -120,7 +120,7 @@ public class PosScreen extends javax.swing.JFrame {
         initUI();
         initAppContext();
     }
-    
+
     private void initInstance() {
         panelSlider = new PanelSlider();
         loginValidation = new Valid();
@@ -138,12 +138,12 @@ public class PosScreen extends javax.swing.JFrame {
         reciptIndent = new ReceiptIndent();
         sellReportAdder = new SellReportAdder();
     }
-    
+
     public void initUI() {
         logoutItem.setEnabled(false);
         panelSlider.changeThePanel(mainPanel, loginPanel);
     }
-    
+
     private void initAppContext() {
         try {
             appContext = new ClassPathXmlApplicationContext("com/coderbd/pos/properties/spring-config.xml");
@@ -152,7 +152,7 @@ public class PosScreen extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
             System.out.println("App Context Not Loaded!");
         }
-        
+
         if (appContext != null) {
             userService = (UserService) appContext.getBean("userService");
             shopService = (ShopService) appContext.getBean("shopService");
@@ -162,7 +162,7 @@ public class PosScreen extends javax.swing.JFrame {
             customerOrderService = (CustomerOrderService) appContext.getBean("customerOrderService");
         }
     }
-    
+
     private void initOrder() {
         productInfoLabel.setText("");
         resetTable.resetTable(orderViewTable);
@@ -171,7 +171,7 @@ public class PosScreen extends javax.swing.JFrame {
         cashField.setText("");
         customerMobileField.setText("");
         customerNameField.setText("");
-        
+
         shopOrder = new ShopOrder();
         String orderId = idBuilder.geOrderUniqueID();
         orderIDViewLabel.setText(orderId);
@@ -180,10 +180,10 @@ public class PosScreen extends javax.swing.JFrame {
         shopOrder.getCustomerOrder().setOrderTime(orderTime);
         shopOrder.getCustomerOrder().setShop(shop);
         shopOrder.getCustomerOrder().setUser(user);
-        
+
         System.out.println("Order: " + shopOrder);
     }
-    
+
     private void updateStockView() {
         if (shop != null) {
             System.out.println("Stock View Updated");
@@ -191,11 +191,11 @@ public class PosScreen extends javax.swing.JFrame {
             productAdder.addProductsInStockView(products, stockTable);
         }
     }
-    
+
     private void updateOrderView() {
-        
+
         shopOrders = customerOrderService.getShopOrders(shop, user);
-        
+
         if (shopOrders != null) {
             System.out.println("Order View Updated");
             shopOrderAdder.addCustomerOrderInOrderView(shopOrders, completeOrderTable);
@@ -299,6 +299,7 @@ public class PosScreen extends javax.swing.JFrame {
         jButton10 = new javax.swing.JButton();
         psSellRateField = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
+        showProductButton = new javax.swing.JButton();
         stockScroll = new javax.swing.JScrollPane();
         stockTable = new javax.swing.JTable();
         shopExpenditurePanel = new javax.swing.JPanel();
@@ -554,7 +555,7 @@ public class PosScreen extends javax.swing.JFrame {
                 .addGroup(signBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(shopNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                     .addComponent(shopAddressLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 232, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(signBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(signBoardPanelLayout.createSequentialGroup()
                         .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -980,7 +981,7 @@ public class PosScreen extends javax.swing.JFrame {
 
         managerShopStockPanel.setLayout(new java.awt.BorderLayout());
 
-        stockInputPanel.setPreferredSize(new java.awt.Dimension(758, 80));
+        stockInputPanel.setPreferredSize(new java.awt.Dimension(758, 90));
 
         jLabel14.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel14.setText("Product Code");
@@ -1011,42 +1012,54 @@ public class PosScreen extends javax.swing.JFrame {
         jLabel25.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel25.setText("Sell Rate (Unit)");
 
+        showProductButton.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        showProductButton.setText("Show Details");
+        showProductButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showProductButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout stockInputPanelLayout = new javax.swing.GroupLayout(stockInputPanel);
         stockInputPanel.setLayout(stockInputPanelLayout);
         stockInputPanelLayout.setHorizontalGroup(
             stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(stockInputPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(psCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(psNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(psQuantityField, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel21)
-                    .addComponent(psBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(showProductButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(stockInputPanelLayout.createSequentialGroup()
-                        .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(psCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton10))
-                    .addComponent(jLabel25))
-                .addContainerGap(36, Short.MAX_VALUE))
+                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(psNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(psQuantityField, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel21)
+                            .addComponent(psBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(stockInputPanelLayout.createSequentialGroup()
+                                .addComponent(jLabel25)
+                                .addGap(109, 274, Short.MAX_VALUE))
+                            .addGroup(stockInputPanelLayout.createSequentialGroup()
+                                .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         stockInputPanelLayout.setVerticalGroup(
             stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(stockInputPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
                     .addComponent(jLabel19)
@@ -1062,7 +1075,9 @@ public class PosScreen extends javax.swing.JFrame {
                     .addComponent(jButton9)
                     .addComponent(jButton10)
                     .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(showProductButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         managerShopStockPanel.add(stockInputPanel, java.awt.BorderLayout.PAGE_START);
@@ -1569,7 +1584,7 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(shopSelectionEnclosedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shopSelectCB, 0, 567, Short.MAX_VALUE)
+                    .addComponent(shopSelectCB, 0, 735, Short.MAX_VALUE)
                     .addComponent(shopSelectErrorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -1995,14 +2010,14 @@ public class PosScreen extends javax.swing.JFrame {
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, true);
             managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, true);
         }
-        
+
         resetTable.resetTable(orderViewTable);
-        
+
         int index = shopSelectCB.getSelectedIndex();
         shop = index != -1 ? shops.get(index) : null;
-        
+
         if (shop != null) {
-            
+
             shopNameLabel.setText(shop.getShopName());
             shopAddressLabel.setText(shop.getShopAddress());
             softUserNameLabel.setText(user.getName());
@@ -2017,7 +2032,7 @@ public class PosScreen extends javax.swing.JFrame {
             /*Initalize the shop products*/
             products = productService.getProducts(shop);
             System.out.println(products);
-            
+
         } else {
             shopSelectErrorLabel.setText(Message.ERROR_ROLE_NOT_ASSIGNED);
         }
@@ -2042,16 +2057,16 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         String username = usernameField.getText();
         String password = passwordField.getText();
-        
+
         if (Valid.vUsername(username) && Valid.vPassword(password)) {
             user = userService.getUser(username, password);
             System.out.println(user);
             if (user != null) {
                 if (user.getAuthority().equals(Role.USER_DEVELOPER)) {
-                    
+
                     devHelper.addRole(authorityComboACP);
                     panelSlider.changeThePanel(mainPanel, accountCreatePanel);
-                    
+
                 } else if (user.getAuthority().equals(Role.USER_MANAGER) || user.getAuthority().equals(Role.USER_STAFF)) {
                     shops = shopService.getShops(user);
                     System.out.println(shops);
@@ -2059,7 +2074,7 @@ public class PosScreen extends javax.swing.JFrame {
                     for (Shop shop : shops) {
                         shopSelectCB.addItem(shop.getShopName());
                     }
-                    
+
                     if (user.getAuthority().equals(Role.USER_STAFF)) {
                         createNewShopButton.setEnabled(false);
                         addNewStaffButton.setEnabled(false);
@@ -2067,7 +2082,7 @@ public class PosScreen extends javax.swing.JFrame {
                         addNewStaffButton.setEnabled(true);
                         createNewShopButton.setEnabled(true);
                     }
-                    
+
                     panelSlider.changeThePanel(mainPanel, selectionPanel);
                 }
                 logoutItem.setEnabled(true);
@@ -2103,7 +2118,7 @@ public class PosScreen extends javax.swing.JFrame {
         resetTable.resetTable(orderViewTable);
         resetTable.resetTable(completeOrderTable);
         resetTable.resetTable(sellReportTable);
-        
+
         shops = null;
         users = null;
         shopBalances = null;
@@ -2134,11 +2149,11 @@ public class PosScreen extends javax.swing.JFrame {
         for (Shop shop : shops) {
             shopCB.addItem(shop.getShopName());
         }
-        
+
         for (User user : users) {
             userCB.addItem(user.getName() + " " + user.getMobile());
         }
-        
+
         panelSlider.changeThePanel(mainPanel, staffAddPanel);
 
     }//GEN-LAST:event_addNewStaffButtonActionPerformed
@@ -2147,7 +2162,7 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         int userIndex = userCB.getSelectedIndex();
         int shopIndex = shopCB.getSelectedIndex();
-        
+
         if (userIndex != -1 && shopIndex != -1) {
             int userId = users.get(userIndex).getUserId();
             int shopId = shops.get(shopIndex).getShopId();
@@ -2179,12 +2194,12 @@ public class PosScreen extends javax.swing.JFrame {
                 mobileFieldACP.getText(),
                 (String) authorityComboACP.getItemAt(authorityComboACP.getSelectedIndex()),
                 true);
-        
+
         if (!Valid.vName(user.getName())
                 || !Valid.vMobile(user.getMobile())
                 || !Valid.vPassword(user.getPassword())
                 || !Valid.vUsername(user.getUsername())) {
-            
+
             userCreationErrorLabel.setForeground(Color.red);
             userCreationErrorLabel.setText(Message.ERROR_INVALID_INPUT);
         } else {
@@ -2192,7 +2207,7 @@ public class PosScreen extends javax.swing.JFrame {
                 System.out.println(user);
                 if (userService.getUser(user.getUsername()) == null && userService.getUser(user.getMobile()) == null) {
                     boolean isUserSaved = userService.createUser(user);
-                    
+
                     if (isUserSaved) {
                         userCreationErrorLabel.setForeground(Color.green);
                         userCreationErrorLabel.setText(Message.SUCCESS_USER_CREATED);
@@ -2239,7 +2254,7 @@ public class PosScreen extends javax.swing.JFrame {
                 shopMobileField.getText());
         System.out.println(user);
         System.out.println(shop);
-        
+
         if (shop.getShopAddress().replace(" ", "").equals("")
                 || shop.getShopName().replace(" ", "").equals("")
                 || shop.getShopTin().replace(" ", "").equals("")
@@ -2272,7 +2287,7 @@ public class PosScreen extends javax.swing.JFrame {
         shopOrder.getCustomerOrder().setBuyerMobile(customerMobileField.getText());
         shopOrder.getCustomerOrder().setBuyerName(customerNameField.getText());
         System.out.println(shopOrder);
-        
+
         if (shopOrder.getOrderProducts().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please add minimum item(s)");
         } else {
@@ -2292,24 +2307,24 @@ public class PosScreen extends javax.swing.JFrame {
                         shopOrder.getCustomerOrder().setTotalDue(0.0);
                     }
                 }
-                OrderFileBuilder orderFileBuilder = new OrderFileBuilder();
+                OrderFileBuilder orderFileBuilder = new OrderFileBuilder(shop);
                 String pdfFileName = orderFileBuilder.makePdf(shopOrder);
                 String inputData = reciptIndent.getIndentedOrder(shopOrder);
-                
+
                 System.out.println("Shop Order: " + shopOrder);
-                
+
                 customerOrderService.completeShopOrder(shopOrder);
                 products = productService.getProducts(shop);
-                
+
                 String[] printerNames = printerLookUp.getPrinterNames();
                 String printerName = (String) JOptionPane.showInputDialog(this,
                         "Which Printer?",
                         "Printer Selection",
                         JOptionPane.QUESTION_MESSAGE,
                         null, printerNames, null);
-                
+
                 System.out.println(printerName);
-                
+
                 PrintService ps = printerLookUp.getPrintService(printerName);
                 if (ps != null) {
                     System.out.println("Printing Command Sends!");
@@ -2335,13 +2350,13 @@ public class PosScreen extends javax.swing.JFrame {
             int productBarcodeQuantity = Integer.parseInt(quantityCodeField.getText());
             productBarcodeQuantity = Math.abs(productBarcodeQuantity);
             String productBarcode = previousCodeField.getText();
-            
+
             if (previousCodeField.getText().replace(" ", "").equals("")) {
                 productBarcode = idBuilder.geProductUniqueID();
                 barcodeQuantityLabel.setText("");
             } else {
                 if (productBarcode.length() == 13) {
-                    
+
                     if (productBarcode.charAt(0) != '1') {
                         barcodeQuantityLabel.setForeground(Color.RED);
                         barcodeQuantityLabel.setText(Message.ERROR_INVALID_BARCODE_ID);
@@ -2354,21 +2369,21 @@ public class PosScreen extends javax.swing.JFrame {
                     barcodeGenerate = false;
                 }
             }
-            
+
             if (barcodeGenerate) {
-                
+
                 barcodeViewField.setText(productBarcode);
                 barcodeInfoLabel.setText(Message.SUCCESS_BARCODE_PDF_CREATED);
-                BarcodePdf barcodePdf = new BarcodePdf(productBarcodeQuantity, productBarcode);
+                BarcodePdf barcodePdf = new BarcodePdf(productBarcodeQuantity, productBarcode, shop);
                 try {
                     barcodePdf.generateBarcodePdf();
                 } catch (UnsupportedEncodingException ex) {
                     Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
         } catch (NumberFormatException nfex) {
-            
+
             System.out.println(nfex.getMessage());
             barcodeQuantityLabel.setForeground(Color.RED);
             barcodeQuantityLabel.setText(Message.ERROR_INVALID_BARCODE_ID);
@@ -2386,7 +2401,7 @@ public class PosScreen extends javax.swing.JFrame {
             updateOrderView();
             sellReportAdder.refreshSellReportShops(sellReportAllShopCB, shops);
             updateSellReportView();
-            
+
         } else if (index == Enum.USER_TAB_BARCODE_GENERATION) {
             barcodeInfoLabel.setText("");
             barcodeViewField.setText("");
@@ -2399,15 +2414,15 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         int rowProductIndex = orderViewTable.getSelectedRow();
         System.out.println("Order Row:" + rowProductIndex);
-        
+
         if (rowProductIndex != Enum.invalidIndex) {
-            
+
             OrderProduct orderProduct = shopOrder.getOrderProducts().get(rowProductIndex);
             Integer newQuantity = (Integer) orderViewTable.getValueAt(rowProductIndex, 3);
             Double newSellRate = (Double) orderViewTable.getValueAt(rowProductIndex, 4);
             Double newDiscount = (Double) orderViewTable.getValueAt(rowProductIndex, 5);
             Double newVAT = (Double) orderViewTable.getValueAt(rowProductIndex, 6);
-            
+
             boolean isDataUpdated = false;
             if (newQuantity == null) {
                 newQuantity = 0;
@@ -2421,39 +2436,39 @@ public class PosScreen extends javax.swing.JFrame {
             if (newDiscount == null) {
                 newDiscount = 0.0;
             }
-            
+
             if (orderProduct.getOrderProductQuantity() != newQuantity) {
-                
+
                 if (orderProduct.getProductStock() > newQuantity) {
                     orderProduct.setOrderProductQuantity(newQuantity);
-                    
+
                 } else {
                     JOptionPane.showMessageDialog(this, "Only " + orderProduct.getProductStock() + " unit(s) available! Please update stock");
                 }
                 isDataUpdated = true;
             }
-            
+
             if (orderProduct.getOrderProductSellRate() != newSellRate) {
                 orderProduct.setOrderProductSellRate(newSellRate);
                 isDataUpdated = true;
             }
-            
+
             if (orderProduct.getOrderProductVat() != newVAT) {
                 orderProduct.setOrderProductVat(newVAT);
                 isDataUpdated = true;
             }
-            
+
             if (orderProduct.getOrderProductDiscount() != newDiscount) {
                 orderProduct.setOrderProductDiscount(newDiscount);
                 isDataUpdated = true;
             }
-            
+
             if (isDataUpdated) {
                 Double productTotalBill = orderProductAdder.updateOrderView(orderViewTable, shopOrder.getOrderProducts());
                 totalBillViewLabel.setText(productTotalBill.toString());
                 orderProductAdder.updateCash(totalBillViewLabel, cashField, cashBackViewLabel, shopOrder);
             }
-            
+
         }
     }//GEN-LAST:event_orderViewTablePropertyChange
 
@@ -2481,14 +2496,14 @@ public class PosScreen extends javax.swing.JFrame {
             shopOrder.getOrderProducts().remove(rowIndex);
             resetTable.resetTable(orderViewTable);
             orderProductAdder.updateOrderView(orderViewTable, shopOrder.getOrderProducts());
-            
+
         }
     }//GEN-LAST:event_removeOtItemButtonActionPerformed
 
     private void newOrderCreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newOrderCreateButtonActionPerformed
         // TODO add your handling code here:
         boolean newOrderValid = false;
-        
+
         if (shopOrder != null && shopOrder.getOrderProducts().isEmpty()) {
             newOrderValid = true;
         } else {
@@ -2497,14 +2512,14 @@ public class PosScreen extends javax.swing.JFrame {
                 newOrderValid = true;
             }
         }
-        
+
         if (newOrderValid) {
             initOrder();
             resetTable.resetTable(orderViewTable);
             totalBillViewLabel.setText("");
             cashBackViewLabel.setText("");
             cashField.setText("");
-            
+
         }
     }//GEN-LAST:event_newOrderCreateButtonActionPerformed
 
@@ -2513,13 +2528,13 @@ public class PosScreen extends javax.swing.JFrame {
         String productBarcode = orderPProductBarcodeField.getText();
         Double vat = 0.0;
         Double discount = 0.0;
-        
+
         try {
             vat = Double.parseDouble(vatField.getText());
         } catch (NumberFormatException nfe) {
             System.out.println(nfe.getMessage());
         }
-        
+
         try {
             discount = Double.parseDouble(discountField.getText());
         } catch (NumberFormatException nfe) {
@@ -2528,7 +2543,7 @@ public class PosScreen extends javax.swing.JFrame {
 
         //        System.out.println("Product Barcode: " + productBarcode);
         if (productBarcode != null && productBarcode.length() == 13) {
-            
+
             orderProductAdder.addProductInOrderView(products,
                     shopOrder,
                     productBarcode,
@@ -2541,7 +2556,7 @@ public class PosScreen extends javax.swing.JFrame {
                     cashField,
                     cashBackViewLabel
             );
-            
+
             System.out.println(productBarcode);
             productInfoLabel.setForeground(Color.RED);
             orderPProductBarcodeField.setText("");
@@ -2589,13 +2604,13 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         String orderCode = cancelOrderField.getText();
         int orderSelected = Enum.invalidIndex;
-        
+
         if (orderCode != null && orderCode.length() == 13) {
             orderSelected = search.searchCustomerOrderFromShopOrder(shopOrders, orderCode);
         } else {
             orderSelected = completeOrderTable.getSelectedRow();
         }
-        
+
         if (orderSelected != Enum.invalidIndex) {
             ShopOrder cancelShopOrder = shopOrders.get(orderSelected);
             int orderDeleteConfirm = JOptionPane.showConfirmDialog(this, "Order ID: " + cancelShopOrder.getCustomerOrder().getOrderBarcode() + " , Total Amount : " + cancelShopOrder.getCustomerOrder().getTotalPaid() + " \n Sure to cancel Order?");
@@ -2606,9 +2621,9 @@ public class PosScreen extends javax.swing.JFrame {
                 products = productService.getProducts(shop);
                 updateStockView();
                 updateOrderView();
-                
+
             }
-            
+
         } else {
             JOptionPane.showMessageDialog(this, "No Order Found With Code ID: " + orderCode);
         }
@@ -2617,7 +2632,7 @@ public class PosScreen extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         String categoryName = JOptionPane.showInputDialog(this, "Category Name", "Add New Category", JOptionPane.INFORMATION_MESSAGE);
-        
+
         if (categoryName != null) {
             categoryName = categoryName.toUpperCase();
             ExpenseCategory expCategory = shopExpenseService.getExpenseCategory(shop.getShopId(), categoryName);
@@ -2691,7 +2706,7 @@ public class PosScreen extends javax.swing.JFrame {
         } catch (NumberFormatException nfe) {
             System.out.println(nfe.getMessage());
         }
-        
+
         expAmountField.setText("");
         expDescField.setText("");
     }//GEN-LAST:event_saveExpenseButtonActionPerformed
@@ -2718,12 +2733,12 @@ public class PosScreen extends javax.swing.JFrame {
                     Double.parseDouble(psBuyRateField.getText()),
                     Double.parseDouble(psSellRateField.getText()),
                     Integer.parseInt(psQuantityField.getText()));
-            
+
             System.out.println(product);
             Product demoProduct = productService.getProduct(shop, product.getProductBarcode());
-            
+
             System.out.println(product);
-            
+
             if (demoProduct == null) {
                 boolean status = productService.createProduct(product);
                 if (status == false) {
@@ -2732,16 +2747,16 @@ public class PosScreen extends javax.swing.JFrame {
             } else {
                 productService.updateProduct(product);
             }
-            
+
             products = productService.getProducts(shop);
             productAdder.addProductsInStockView(products, stockTable);
-            
+
             psCodeField.setText("");
             psNameField.setText("");
             psQuantityField.setText("");
             psBuyRateField.setText("");
             psSellRateField.setText("");
-            
+
         } catch (NumberFormatException nfe) {
             System.out.println(nfe.getMessage());
         }
@@ -2756,11 +2771,11 @@ public class PosScreen extends javax.swing.JFrame {
     private void completeOrderTablePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_completeOrderTablePropertyChange
         // TODO add your handling code here:
         int selectedRow = completeOrderTable.getSelectedRow();
-        
+
         if (selectedRow != Enum.invalidIndex) {
             CustomerOrder customerOrder = shopOrders.get(selectedRow).getCustomerOrder();
             Double paidAmount = (Double) completeOrderTable.getValueAt(selectedRow, 5);
-            
+
             if (paidAmount != customerOrder.getTotalPaid()) {
                 int updateConfirm = JOptionPane.showConfirmDialog(this, "Order Id: " + customerOrder.getOrderBarcode() + " Paid Amount: " + paidAmount + " Update Confirm?");
                 if (updateConfirm == JOptionPane.YES_OPTION) {
@@ -2769,9 +2784,9 @@ public class PosScreen extends javax.swing.JFrame {
                     dummyOrder.setTotalDue(
                             dummyOrder.getTotalAmount() - dummyOrder.getTotalPaid()
                     );
-                    
+
                     System.out.println(dummyOrder);
-                    
+
                     boolean isUpdated = customerOrderService.updateCustomerOrder(dummyOrder);
 //
                     if (isUpdated == true) {
@@ -2781,12 +2796,12 @@ public class PosScreen extends javax.swing.JFrame {
                     } else {
                         shopOrderAdder.addCustomerOrderInOrderView(shopOrders, completeOrderTable);
                     }
-                    
+
                 } else {
                     shopOrderAdder.addCustomerOrderInOrderView(shopOrders, completeOrderTable);
                 }
             }
-            
+
         }
     }//GEN-LAST:event_completeOrderTablePropertyChange
 
@@ -2797,29 +2812,29 @@ public class PosScreen extends javax.swing.JFrame {
         ShopOrder shopOrder = null;
         if (orderCode != null && orderCode.length() == 13) {
             shopOrderIndex = search.searchCustomerOrderFromShopOrder(shopOrders, orderCode);
-            
+
         } else {
             shopOrderIndex = completeOrderTable.getSelectedRow();
         }
-        
+
         if (shopOrderIndex != Enum.invalidIndex) {
             shopOrder = shopOrders.get(shopOrderIndex);
             System.out.println(shopOrder);
             String orderReceipt = reciptIndent.getIndentedOrder(shopOrder);
             System.out.println(orderReceipt);
-            
+
             String[] printerNames = printerLookUp.getPrinterNames();
-            
+
             String printerName = (String) JOptionPane.showInputDialog(this,
                     "Which Printer?",
                     "Printer Selection",
                     JOptionPane.QUESTION_MESSAGE,
                     null, printerNames, null);
-            
+
             System.out.println(printerName);
-            
+
             PrintService ps = printerLookUp.getPrintService(printerName);
-            
+
             if (ps != null) {
                 System.out.println("Printing Command Sends!");
                 Printer printer = new Printer();
@@ -2836,10 +2851,10 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         int productIndex = stockTable.getSelectedRow();
         if (productIndex != Enum.invalidIndex) {
-            
+
             Product product = products.get(productIndex);
             Product dummyProduct = new Product();
-            
+
             dummyProduct.setProductId(product.getProductId());
             dummyProduct.setProductBarcode(product.getProductBarcode());
             dummyProduct.setShopId(shop.getShopId());
@@ -2847,27 +2862,27 @@ public class PosScreen extends javax.swing.JFrame {
             dummyProduct.setProductStock((int) stockTable.getValueAt(productIndex, 2));
             dummyProduct.setProductBuyRate((double) stockTable.getValueAt(productIndex, 3));
             dummyProduct.setProductSellRate((double) stockTable.getValueAt(productIndex, 4));
-            
+
             boolean productUpdated = false;
-            
+
             if (!dummyProduct.getProductName().equals(product.getProductName())) {
                 productUpdated = true;
             }
-            
+
             if (dummyProduct.getProductBuyRate() != product.getProductBuyRate()) {
                 productUpdated = true;
             }
-            
+
             if (dummyProduct.getProductStock() != product.getProductStock()) {
                 productUpdated = true;
             }
-            
+
             if (dummyProduct.getProductSellRate() != product.getProductSellRate()) {
                 productUpdated = true;
             }
-            
+
             if (productUpdated == true) {
-                
+
                 System.out.println("Product: " + dummyProduct);
                 int option = JOptionPane.showConfirmDialog(this,
                         "Product Code: " + dummyProduct.getProductBarcode()
@@ -2884,38 +2899,59 @@ public class PosScreen extends javax.swing.JFrame {
                 }
                 updateStockView();
             }
-            
+
         }
     }//GEN-LAST:event_stockTablePropertyChange
-    
+
+    private void showProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showProductButtonActionPerformed
+        // TODO add your handling code here:
+        String productCode = psCodeField.getText();
+        int productIndex = Enum.invalidIndex;
+        if (productCode != null && productCode.length() == 13 && productCode.charAt(0) == '1') {
+            productIndex = search.searchProduct(products, productCode);
+        }
+
+        if (productIndex != Enum.invalidIndex) {
+            Product p = products.get(productIndex);
+            JOptionPane.showMessageDialog(this,
+                    "Product Code: " + p.getProductBarcode()
+                    + "\nProduct Name: " + p.getProductName()
+                    + "\nProduct Stock: " + p.getProductStock()
+                    + "\nProduct Buy Rate: " + p.getProductBuyRate()
+                    + "\nProduct Sell Rate: " + p.getProductSellRate(), "Product Details", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No Product Found With Product Code: " + productCode, "Product Details", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_showProductButtonActionPerformed
+
     private void updateSellReportView() {
-        
+
         shopBalances = shopService.getShopBalances(shops);
-        
+
         int selectedShopIndex = sellReportAllShopCB.getSelectedIndex();
         Date dateFrom = sellDateFrom.getDate();
         Date dateTo = sellDateTo.getDate();
-        
+
         if (dateFrom == null) {
             dateFrom = new Date();
         }
-        
+
         if (dateTo == null) {
             dateTo = new Date();
         }
-        
+
         System.out.println(dateFrom + " " + dateTo);
-        
+
         if (selectedShopIndex != Enum.invalidIndex) {
             SellReportAdder sellReportAdder = new SellReportAdder();
-            
+
             if (selectedShopIndex == Enum.firstIndex) {
-                
+
                 if (shopBalances != null) {
                     sellReportAdder.updateSellReportTable(shopBalances, sellReportTable,
                             totalSellLabel, totalPaidLabel, totalDueLabel, totalProfitLabel, dateFrom, dateTo);
                 }
-                
+
             } else {
                 selectedShopIndex--;
                 if (shopBalances != null) {
@@ -3135,6 +3171,7 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel shopSelectErrorLabel;
     private javax.swing.JPanel shopSelectionEnclosedPanel;
     private javax.swing.JTextField shopTinField;
+    private javax.swing.JButton showProductButton;
     private javax.swing.JPanel signBoardPanel;
     private javax.swing.JLabel softUserMobileLabel;
     private javax.swing.JLabel softUserNameLabel;
