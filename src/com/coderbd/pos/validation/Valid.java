@@ -41,6 +41,7 @@ public class Valid {
             char ch = username.charAt(i);
             if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
                 alpha = true;
+            } else if (ch == '.' || ch == '-' || ch == ' ') {
             } else {
                 other = true;
                 break;

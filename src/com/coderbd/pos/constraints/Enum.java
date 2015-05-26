@@ -17,7 +17,6 @@ public class Enum {
     public static final int ORDER = 2;
 
     public static final int USER_TAB_CUSTOMER_ORDER = 0;
-//    public static final int USER_TAB_SEARCH_PRODUCT=1;
     public static final int USER_TAB_BARCODE_GENERATION = 1;
     public static final int USER_TAB_MANAGER = 2;
 

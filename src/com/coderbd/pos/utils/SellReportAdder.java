@@ -27,7 +27,7 @@ public class SellReportAdder {
         resetter = new ResetTable();
     }
 
-    public void refreshShops(JComboBox cb, List<Shop> shops) {
+    public void refreshSellReportShops(JComboBox cb, List<Shop> shops) {
         cb.removeAllItems();
         cb.addItem("ALL SHOPS");
         for (Shop shop : shops) {

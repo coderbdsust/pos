@@ -1987,7 +1987,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void openShopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openShopButtonActionPerformed
         // TODO add your handling code here:
-
+        userTabPanel.setSelectedIndex(Enum.firstIndex);
         if (user.getAuthority().equals(Role.USER_STAFF)) {
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, false);
             managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, false);
@@ -2016,6 +2016,7 @@ public class PosScreen extends javax.swing.JFrame {
             expenseAdder.addCategoriesInComboBox(shopExpenses, expCategoryCB);
             /*Initalize the shop products*/
             products = productService.getProducts(shop);
+            System.out.println(products);
             
         } else {
             shopSelectErrorLabel.setText(Message.ERROR_ROLE_NOT_ASSIGNED);
@@ -2053,7 +2054,6 @@ public class PosScreen extends javax.swing.JFrame {
                     
                 } else if (user.getAuthority().equals(Role.USER_MANAGER) || user.getAuthority().equals(Role.USER_STAFF)) {
                     shops = shopService.getShops(user);
-                    
                     System.out.println(shops);
                     shopSelectCB.removeAllItems();
                     for (Shop shop : shops) {
@@ -2099,6 +2099,20 @@ public class PosScreen extends javax.swing.JFrame {
 
         /*Reset Item*/
         resetTable.resetTable(stockTable);
+        resetTable.resetTable(expenseTable);
+        resetTable.resetTable(orderViewTable);
+        resetTable.resetTable(completeOrderTable);
+        resetTable.resetTable(sellReportTable);
+        
+        shops = null;
+        users = null;
+        shopBalances = null;
+        products = null;
+        shopExpenses = null;
+        shopOrders = null;
+        user = null;
+        shop = null;
+        shopOrder = null;
     }//GEN-LAST:event_logoutItemActionPerformed
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
@@ -2282,6 +2296,8 @@ public class PosScreen extends javax.swing.JFrame {
                 String pdfFileName = orderFileBuilder.makePdf(shopOrder);
                 String inputData = reciptIndent.getIndentedOrder(shopOrder);
                 
+                System.out.println("Shop Order: " + shopOrder);
+                
                 customerOrderService.completeShopOrder(shopOrder);
                 products = productService.getProducts(shop);
                 
@@ -2291,7 +2307,9 @@ public class PosScreen extends javax.swing.JFrame {
                         "Printer Selection",
                         JOptionPane.QUESTION_MESSAGE,
                         null, printerNames, null);
+                
                 System.out.println(printerName);
+                
                 PrintService ps = printerLookUp.getPrintService(printerName);
                 if (ps != null) {
                     System.out.println("Printing Command Sends!");
@@ -2366,6 +2384,7 @@ public class PosScreen extends javax.swing.JFrame {
         if (index == Enum.USER_TAB_MANAGER) {
             updateStockView();
             updateOrderView();
+            sellReportAdder.refreshSellReportShops(sellReportAllShopCB, shops);
             updateSellReportView();
             
         } else if (index == Enum.USER_TAB_BARCODE_GENERATION) {
@@ -2590,6 +2609,8 @@ public class PosScreen extends javax.swing.JFrame {
                 
             }
             
+        } else {
+            JOptionPane.showMessageDialog(this, "No Order Found With Code ID: " + orderCode);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -2704,7 +2725,10 @@ public class PosScreen extends javax.swing.JFrame {
             System.out.println(product);
             
             if (demoProduct == null) {
-                productService.createProduct(product);
+                boolean status = productService.createProduct(product);
+                if (status == false) {
+                    JOptionPane.showMessageDialog(selectionPanel, Message.ERROR_DUPLICATE_BARCODE, null, JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 productService.updateProduct(product);
             }
