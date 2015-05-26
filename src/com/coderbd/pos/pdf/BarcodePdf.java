@@ -30,6 +30,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.hyphenation.TernaryTree;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -42,8 +43,10 @@ public class BarcodePdf {
 
     private DirectoryCreator directoryCreator;
     private String directory = "GenratedBarcode";
+    private Shop shop = null;
     private int barcodeQuantity;
     private String barcodeData;
+
     private double productRate = 150;
 
     public BarcodePdf(int barcodeQuantity, String barcodeData) {
@@ -54,7 +57,8 @@ public class BarcodePdf {
     }
 
     public BarcodePdf(int barcodeQuantity, String barcodeData, Shop shop) {
-        this.barcodeQuantity = barcodeQuantity;
+        this.shop = shop;
+        this.barcodeQuantity = (int) (barcodeQuantity / 2);
         this.barcodeData = barcodeData;
         directoryCreator = new DirectoryCreator();
         directory = shop.getShopName() + "\\" + directory;
@@ -120,6 +124,74 @@ public class BarcodePdf {
         } catch (DocumentException | FileNotFoundException dex) {
             System.out.println(dex.getMessage());
         }
+
+    }
+
+    public void generateBarcodePdf(int amount) throws UnsupportedEncodingException {
+        try {
+            String filename = directory + "\\" + barcodeData + ".pdf";
+            Document document = new Document(PageSize.A4);
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
+            document.open();
+            PdfContentByte cb = writer.getDirectContent();
+            Barcode128 code25 = new Barcode128();
+            code25.setGenerateChecksum(true);
+            code25.setCode(barcodeData);
+            code25.setSize(10f);
+            code25.setX(1.50f);
+
+            PdfPTable pdfPTable = new PdfPTable(3);
+            float[] widths = {0.45f, .10f, .45f};
+            pdfPTable.setWidths(widths);
+            String codeName = getCodeName(shop.getShopName(), shop.getShopId(), amount);
+            System.out.println("BarCodeName:" + codeName);
+
+            Image image = code25.createImageWithBarcode(cb, null, null);
+
+            PdfPCell title = new PdfPCell(new Paragraph(codeName));
+            title.setBorder(Rectangle.NO_BORDER);
+
+            PdfPCell barcodeCell = new PdfPCell(image, true);
+            barcodeCell.setBorder(Rectangle.NO_BORDER);
+
+            PdfPCell blank = new PdfPCell();
+            blank.setBorder(Rectangle.NO_BORDER);
+
+            for (int i = 0; i < barcodeQuantity; i++) {
+
+                pdfPTable.addCell(title);
+                pdfPTable.addCell(blank);
+                pdfPTable.addCell(title);
+                pdfPTable.addCell(barcodeCell);
+                pdfPTable.addCell(blank);
+                pdfPTable.addCell(barcodeCell);
+            }
+            document.add(pdfPTable);
+            document.close();
+        } catch (DocumentException | FileNotFoundException dex) {
+            System.out.println(dex.getMessage());
+        }
+    }
+
+    private String getCodeName(String shopName, int shopId, int amount) {
+        String[] words = shopName.split(" ");
+
+        String output = "";
+
+        for (String word : words) {
+            output += word.charAt(0);
+        }
+
+        String str = String.format("%d", shopId);
+        int strLength = 4 - str.length();
+        while (strLength > 0) {
+            str = "9" + str;
+            strLength--;
+        }
+        output += str;
+        output += String.format("%06d88", amount);
+
+        return output;
 
     }
 }

@@ -278,6 +278,8 @@ public class PosScreen extends javax.swing.JFrame {
         quantityCodeField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         barcodeQuantityLabel = new javax.swing.JLabel();
+        barcodeTKField = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
         barcodeSimulatePanel = new javax.swing.JPanel();
         bcodeGenButton = new javax.swing.JButton();
         barcodeViewPanel = new javax.swing.JPanel();
@@ -869,9 +871,12 @@ public class PosScreen extends javax.swing.JFrame {
         jLabel10.setText("Previous Barcode");
 
         jLabel34.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel34.setText("Row Quantity");
+        jLabel34.setText("Code Quantity");
 
         jLabel3.setText("KEEP BLANK FOR GENERATING NEW BARCODE");
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel7.setText("Amount");
 
         javax.swing.GroupLayout barcodeInputPanelLayout = new javax.swing.GroupLayout(barcodeInputPanel);
         barcodeInputPanel.setLayout(barcodeInputPanelLayout);
@@ -889,8 +894,13 @@ public class PosScreen extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(230, Short.MAX_VALUE))
+                    .addGroup(barcodeInputPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(barcodeTKField, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)
+                        .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         barcodeInputPanelLayout.setVerticalGroup(
             barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -902,12 +912,15 @@ public class PosScreen extends javax.swing.JFrame {
                     .addComponent(jLabel3))
                 .addGap(22, 22, 22)
                 .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(barcodeTKField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(barcodeInputPanelLayout.createSequentialGroup()
                         .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel34)
                             .addComponent(quantityCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -2371,14 +2384,20 @@ public class PosScreen extends javax.swing.JFrame {
             }
 
             if (barcodeGenerate) {
-
-                barcodeViewField.setText(productBarcode);
-                barcodeInfoLabel.setText(Message.SUCCESS_BARCODE_PDF_CREATED);
-                BarcodePdf barcodePdf = new BarcodePdf(productBarcodeQuantity, productBarcode, shop);
                 try {
-                    barcodePdf.generateBarcodePdf();
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
+                    int amount = Integer.parseInt(barcodeTKField.getText());
+                    try {
+                        barcodeViewField.setText(productBarcode);
+                        barcodeInfoLabel.setText(Message.SUCCESS_BARCODE_PDF_CREATED);
+                        BarcodePdf barcodePdf = new BarcodePdf(productBarcodeQuantity, productBarcode, shop);
+                        barcodePdf.generateBarcodePdf(amount);
+                    } catch (UnsupportedEncodingException ex) {
+                        Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (NumberFormatException nfe) {
+                    System.out.println(nfe.getMessage());
+                    barcodeQuantityLabel.setForeground(Color.RED);
+                    barcodeQuantityLabel.setText(Message.ERROR_INVALID_AMOUNT);
                 }
             }
 
@@ -3022,6 +3041,7 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JPanel barcodeInputPanel;
     private javax.swing.JLabel barcodeQuantityLabel;
     private javax.swing.JPanel barcodeSimulatePanel;
+    private javax.swing.JTextField barcodeTKField;
     private javax.swing.JTextField barcodeViewField;
     private javax.swing.JPanel barcodeViewPanel;
     private javax.swing.JButton bcodeGenButton;
@@ -3099,6 +3119,7 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;

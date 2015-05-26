@@ -15,6 +15,7 @@ public class Message {
     public static String ERROR_PASSWORD = "CHECK THE PASSWORD!";
     public static String ERROR_PASSWORD_NOT_MATCHED = "PASSWORD NOT MATCHED!";
     public static String ERROR_INVALID_INPUT = "INVALID INPUT!";
+    public static String ERROR_INVALID_AMOUNT = "INVALID AMOUNT INPUT!";
     public static String ERROR_INVALID_USRER_INFO = "INVALID USERNAME/PASSWORD";
     public static String ERROR_ROLE_NOT_ASSIGNED = "SORRY, YOUR ROLE NOT ASSIGNED IN ANY SHOP!";
     public static String ERROR_ROLE_MAYBE_ASSIGNED = "THIS ROLE MAYBE ASSIGNED ALREADY!";
