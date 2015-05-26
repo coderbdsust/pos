@@ -45,6 +45,7 @@ public class OrderProductsDao {
                     orderProduct.setOrderProductId(rs.getInt("order_product_id"));
                     orderProduct.setCustomerOrderId(rs.getInt("customer_order_id"));
                     orderProduct.setProductId(rs.getInt("product_id"));
+                    orderProduct.setProductBarcode(rs.getString("product_barcode"));
                     orderProduct.setProductName(rs.getString("product_name"));
                     orderProduct.setOrderProductQuantity(rs.getInt("order_product_quantity"));
                     orderProduct.setOrderProductSellRate(rs.getDouble("order_product_sell_rate"));

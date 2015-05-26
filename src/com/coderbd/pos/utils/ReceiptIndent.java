@@ -21,35 +21,35 @@ public class ReceiptIndent {
 
     private void printShopHeader(String header) {
         header = header.replace(", ", ",");
-        header = centerAlign(header, 35);
-        output += String.format("%35s\n", header);
+        header = centerAlign(header, 37);
+        output += String.format("%37s\n", header);
     }
 
     private void printOrderID(String OrderCode) {
-        output += String.format("\n%-35s\n", "ORDER ID: " + OrderCode);
+        output += String.format("\n%-37s\n", "ORDER ID: " + OrderCode);
     }
 
     private void printProductTitle() {
-        output += String.format("%-3s %4s %4s %10s %10s\n", "QTY", "DIS ", " VAT", "   Rate   ", "   Total  ");
-        output += String.format("%-3s %-4s %-4s %10s %10s\n", "---", "----", "----", "----------", "----------");
+        output += String.format("%-3s %5s %5s %10s %10s\n", "QTY", "DIS ", "VAT(%)", "  Rate   ", "   Total  ");
+        output += String.format("%-3s %-5s %-5s %10s %10s\n", "---", "----", "----", "----------", "----------");
     }
 
     private void printItem(String itemName, int qty, double dis, double vat, double sellRate, double price) {
-        output += String.format("%-35s\n", itemName);
-        output += String.format("%-3d %-4.2f %-4.2f %10.2f %10.2f\n", qty, dis, vat, sellRate, price);
+        output += String.format("%-37s\n", itemName);
+        output += String.format("%-3d %-5.2f %-5.2f %10.2f %10.2f\n", qty, dis, vat, sellRate, price);
 
     }
 
     private void printTotal(double totalBill, double totalPaid, double due) {
-        output += String.format("%-17s %17s\n", " ", "-----------------");
-        output += String.format("%-17s %17.2f\n", "TOTAL BILL", totalBill);
-        output += String.format("%-17s %17.2f\n", "TOTAL PAID", totalPaid);
-        output += String.format("%-17s %17s\n", " ", "-----------------");
-        output += String.format("%-17s %17.2f\n", "DUE", due);
+        output += String.format("%-17s %19s\n", " ", "-----------------");
+        output += String.format("%-17s %19.2f\n", "TOTAL BILL", totalBill);
+        output += String.format("%-17s %19.2f\n", "TOTAL PAID", totalPaid);
+        output += String.format("%-17s %19s\n", " ", "-----------------");
+        output += String.format("%-17s %19.2f\n", "DUE", due);
     }
 
     private void printShopFooter(String footer) {
-        output += String.format("%35s\n", footer);
+        output += String.format("%37s\n", footer);
     }
 
     public String getIndentedOrder(ShopOrder shopOrder) {
@@ -72,10 +72,10 @@ public class ReceiptIndent {
             double qtyPrice = sellRate * qty;
 
             double price = qtyPrice + qtyPrice * 0.01 * vat - qtyPrice * 0.01 * dis;
-            
+
             System.out.println(price);
-            
-            printItem(op.getProductName(), qty, dis, vat, sellRate, price);
+
+            printItem(op.getProductBarcode() + "-" + op.getProductName(), qty, dis, vat, sellRate, price);
         }
         printTotal(customerOrder.getTotalAmount(),
                 customerOrder.getTotalPaid(),
