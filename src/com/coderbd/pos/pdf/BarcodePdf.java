@@ -44,9 +44,8 @@ public class BarcodePdf {
     private DirectoryCreator directoryCreator;
     private String directory = "GenratedBarcode";
     private Shop shop = null;
-    private int barcodeQuantity;
+    private int barcodeQuantity = 11;
     private String barcodeData;
-
     private double productRate = 150;
 
     public BarcodePdf(int barcodeQuantity, String barcodeData) {
@@ -56,9 +55,8 @@ public class BarcodePdf {
         directoryCreator.makeDir(directory);
     }
 
-    public BarcodePdf(int barcodeQuantity, String barcodeData, Shop shop) {
+    public BarcodePdf(String barcodeData, Shop shop) {
         this.shop = shop;
-        this.barcodeQuantity = (int) (barcodeQuantity / 2);
         this.barcodeData = barcodeData;
         directoryCreator = new DirectoryCreator();
         directory = shop.getShopName() + "\\" + directory;
@@ -79,52 +77,6 @@ public class BarcodePdf {
 
     public void setBarcodeData(String barcodeData) {
         this.barcodeData = barcodeData;
-    }
-
-    public void generateBarcodePdf() throws UnsupportedEncodingException {
-        try {
-            String filename = directory + "\\" + barcodeData + ".pdf";
-            Document document = new Document(PageSize.A4);
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
-            document.open();
-            PdfContentByte cb = writer.getDirectContent();
-            Barcode128 code25 = new Barcode128();
-            code25.setGenerateChecksum(true);
-            code25.setCode(barcodeData);
-            code25.setSize(10f);
-            code25.setX(1.50f);
-
-            PdfPTable pdfPTable = new PdfPTable(3);
-            float[] widths = {0.45f, .10f, .45f};
-            pdfPTable.setWidths(widths);
-
-            for (int i = 0; i < barcodeQuantity; i++) {
-                Image image = code25.createImageWithBarcode(cb, null, null);
-
-                PdfPCell pdfPCell1 = new PdfPCell(image, true);
-                pdfPCell1.setBorder(Rectangle.NO_BORDER);
-
-                PdfPCell pdfPCell2 = new PdfPCell();
-                pdfPCell2.setBorder(Rectangle.NO_BORDER);
-
-                PdfPCell pdfPCell3 = new PdfPCell(image, true);
-                pdfPCell3.setBorder(Rectangle.NO_BORDER);
-
-                pdfPTable.addCell(pdfPCell1);
-                pdfPTable.addCell(pdfPCell2);
-                pdfPTable.addCell(pdfPCell3);
-
-                pdfPTable.addCell(pdfPCell2);
-                pdfPTable.addCell(pdfPCell2);
-                pdfPTable.addCell(pdfPCell2);
-
-            }
-            document.add(pdfPTable);
-            document.close();
-        } catch (DocumentException | FileNotFoundException dex) {
-            System.out.println(dex.getMessage());
-        }
-
     }
 
     public void generateBarcodePdf(int amount) throws UnsupportedEncodingException {
@@ -148,7 +100,9 @@ public class BarcodePdf {
 
             Image image = code25.createImageWithBarcode(cb, null, null);
 
-            PdfPCell title = new PdfPCell(new Paragraph(codeName));
+            Paragraph paragraph = new Paragraph(codeName);
+            paragraph.setSpacingBefore(10.0f);
+            PdfPCell title = new PdfPCell(paragraph);
             title.setBorder(Rectangle.NO_BORDER);
 
             PdfPCell barcodeCell = new PdfPCell(image, true);
@@ -157,14 +111,31 @@ public class BarcodePdf {
             PdfPCell blank = new PdfPCell();
             blank.setBorder(Rectangle.NO_BORDER);
 
-            for (int i = 0; i < barcodeQuantity; i++) {
+            Paragraph blankParagraph = new Paragraph("-                                                    -");
+            PdfPCell pdfPCellBlank = new PdfPCell(blankParagraph);
+            pdfPCellBlank.setBorder(Rectangle.NO_BORDER);
 
+            for (int i = 0; i < barcodeQuantity; i++) {
+                /**
+                 * This is for barcode pdf title
+                 */
                 pdfPTable.addCell(title);
                 pdfPTable.addCell(blank);
                 pdfPTable.addCell(title);
+
+                /**
+                 * This is for barcode image
+                 */
                 pdfPTable.addCell(barcodeCell);
                 pdfPTable.addCell(blank);
                 pdfPTable.addCell(barcodeCell);
+
+                /**
+                 * Blank space after barcode image
+                 */
+                pdfPTable.addCell(pdfPCellBlank);
+                pdfPTable.addCell(blank);
+                pdfPTable.addCell(pdfPCellBlank);
             }
             document.add(pdfPTable);
             document.close();
@@ -183,13 +154,13 @@ public class BarcodePdf {
         }
 
         String str = String.format("%d", shopId);
-        int strLength = 4 - str.length();
+        int strLength = 5 - str.length();
         while (strLength > 0) {
             str = "9" + str;
             strLength--;
         }
         output += str;
-        output += String.format("%06d88", amount);
+        output += String.format("0%06d88", amount);
 
         return output;
 

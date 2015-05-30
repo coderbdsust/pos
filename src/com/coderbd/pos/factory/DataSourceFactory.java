@@ -5,6 +5,7 @@
  */
 package com.coderbd.pos.factory;
 
+import com.coderbd.pos.constraints.Const;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.context.annotation.Bean;
@@ -19,12 +20,11 @@ public class DataSourceFactory {
 
     @Bean(name = "dataSource")
     public DataSource createBasicDataSource() {
-
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/pos");
-        dataSource.setUsername("root");
-        dataSource.setPassword("coderbd");
+        dataSource.setDriverClassName(Const.DB_DRIVER_NAME);
+        dataSource.setUrl(Const.DB_URL);
+        dataSource.setUsername(Const.DB_USERNAME);
+        dataSource.setPassword(Const.DB_PASSWORD);
         return dataSource;
     }
 

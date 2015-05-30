@@ -5,6 +5,8 @@
  */
 package com.coderbd.pos.design;
 
+import com.coderbd.pos.backup.Backup;
+import com.coderbd.pos.backup.CryptoUtils;
 import com.coderbd.pos.constraints.Enum;
 import com.coderbd.pos.constraints.Message;
 import com.coderbd.pos.constraints.Role;
@@ -141,6 +143,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     public void initUI() {
         logoutItem.setEnabled(false);
+        backupDateItem.setEnabled(false);
         panelSlider.changeThePanel(mainPanel, loginPanel);
     }
 
@@ -273,9 +276,7 @@ public class PosScreen extends javax.swing.JFrame {
         barcodeGenerationPanel = new javax.swing.JPanel();
         barcodeInputPanel = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
         previousCodeField = new javax.swing.JTextField();
-        quantityCodeField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         barcodeQuantityLabel = new javax.swing.JLabel();
         barcodeTKField = new javax.swing.JTextField();
@@ -672,7 +673,7 @@ public class PosScreen extends javax.swing.JFrame {
                             .addComponent(vatField)
                             .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)))
                     .addComponent(productInfoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 159, Short.MAX_VALUE)
                 .addGroup(orderInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(removeOtItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(newOrderCreateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -773,7 +774,7 @@ public class PosScreen extends javax.swing.JFrame {
                     .addComponent(customerNameField, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(orderIDViewLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(orderCompleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                .addComponent(orderCompleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(orderFinalizePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -870,9 +871,6 @@ public class PosScreen extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel10.setText("Previous Barcode");
 
-        jLabel34.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel34.setText("Code Quantity");
-
         jLabel3.setText("KEEP BLANK FOR GENERATING NEW BARCODE");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -885,21 +883,19 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(barcodeInputPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(previousCodeField)
-                    .addComponent(quantityCodeField, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(previousCodeField, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                    .addComponent(barcodeTKField))
                 .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(barcodeTKField, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(41, 41, 41)
-                        .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(426, 426, 426)
+                        .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(barcodeInputPanelLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         barcodeInputPanelLayout.setVerticalGroup(
@@ -915,12 +911,7 @@ public class PosScreen extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(barcodeTKField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                        .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel34)
-                            .addComponent(quantityCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -938,7 +929,7 @@ public class PosScreen extends javax.swing.JFrame {
         barcodeSimulatePanel.setLayout(barcodeSimulatePanelLayout);
         barcodeSimulatePanelLayout.setHorizontalGroup(
             barcodeSimulatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bcodeGenButton, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE)
+            .addComponent(bcodeGenButton, javax.swing.GroupLayout.DEFAULT_SIZE, 1037, Short.MAX_VALUE)
         );
         barcodeSimulatePanelLayout.setVerticalGroup(
             barcodeSimulatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -968,7 +959,7 @@ public class PosScreen extends javax.swing.JFrame {
                     .addGroup(barcodeViewPanelLayout.createSequentialGroup()
                         .addGap(313, 313, 313)
                         .addComponent(barcodeViewField, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addContainerGap(278, Short.MAX_VALUE))
         );
         barcodeViewPanelLayout.setVerticalGroup(
             barcodeViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1199,7 +1190,7 @@ public class PosScreen extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(expDescField, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                        .addComponent(expDescField, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(expAmountField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
@@ -1214,7 +1205,7 @@ public class PosScreen extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(categoryExpenseTotalLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(expDate, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE))
+                            .addComponent(expDate, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveExpenseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1324,7 +1315,7 @@ public class PosScreen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelOrderField, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(42, 42, 42)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE))
+                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE))
                     .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1482,7 +1473,7 @@ public class PosScreen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel8)
                         .addGap(533, 533, 533)))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(203, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1597,7 +1588,7 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(shopSelectionEnclosedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shopSelectCB, 0, 735, Short.MAX_VALUE)
+                    .addComponent(shopSelectCB, 0, 819, Short.MAX_VALUE)
                     .addComponent(shopSelectErrorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -1854,7 +1845,7 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(accountCreatePanelLayout.createSequentialGroup()
                 .addGap(258, 258, 258)
                 .addComponent(acpEnclosedPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addContainerGap(419, Short.MAX_VALUE))
         );
         accountCreatePanelLayout.setVerticalGroup(
             accountCreatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1969,6 +1960,11 @@ public class PosScreen extends javax.swing.JFrame {
         editMenu.setText("Edit");
 
         backupDateItem.setText("Backup Data");
+        backupDateItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backupDateItemActionPerformed(evt);
+            }
+        });
         editMenu.add(backupDateItem);
 
         menuBar.add(editMenu);
@@ -2020,6 +2016,7 @@ public class PosScreen extends javax.swing.JFrame {
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, false);
             managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, false);
         } else if (user.getAuthority().equals(Role.USER_MANAGER)) {
+
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, true);
             managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, true);
         }
@@ -2075,6 +2072,7 @@ public class PosScreen extends javax.swing.JFrame {
             user = userService.getUser(username, password);
             System.out.println(user);
             if (user != null) {
+
                 if (user.getAuthority().equals(Role.USER_DEVELOPER)) {
 
                     devHelper.addRole(authorityComboACP);
@@ -2099,6 +2097,7 @@ public class PosScreen extends javax.swing.JFrame {
                     panelSlider.changeThePanel(mainPanel, selectionPanel);
                 }
                 logoutItem.setEnabled(true);
+                backupDateItem.setEnabled(true);
             } else {
                 logInError.setText(Message.ERROR_INVALID_USRER_INFO);
             }
@@ -2141,6 +2140,7 @@ public class PosScreen extends javax.swing.JFrame {
         user = null;
         shop = null;
         shopOrder = null;
+        backupDateItem.setEnabled(false);
     }//GEN-LAST:event_logoutItemActionPerformed
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
@@ -2360,8 +2360,7 @@ public class PosScreen extends javax.swing.JFrame {
 //        BarCodeGenerate barcode = new BarCodeGenerate();
         boolean barcodeGenerate = true;
         try {
-            int productBarcodeQuantity = Integer.parseInt(quantityCodeField.getText());
-            productBarcodeQuantity = Math.abs(productBarcodeQuantity);
+
             String productBarcode = previousCodeField.getText();
 
             if (previousCodeField.getText().replace(" ", "").equals("")) {
@@ -2389,7 +2388,7 @@ public class PosScreen extends javax.swing.JFrame {
                     try {
                         barcodeViewField.setText(productBarcode);
                         barcodeInfoLabel.setText(Message.SUCCESS_BARCODE_PDF_CREATED);
-                        BarcodePdf barcodePdf = new BarcodePdf(productBarcodeQuantity, productBarcode, shop);
+                        BarcodePdf barcodePdf = new BarcodePdf(productBarcode, shop);
                         barcodePdf.generateBarcodePdf(amount);
                     } catch (UnsupportedEncodingException ex) {
                         Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
@@ -2424,7 +2423,7 @@ public class PosScreen extends javax.swing.JFrame {
         } else if (index == Enum.USER_TAB_BARCODE_GENERATION) {
             barcodeInfoLabel.setText("");
             barcodeViewField.setText("");
-            quantityCodeField.setText("");
+
             previousCodeField.setText("");
         }
     }//GEN-LAST:event_userTabPanelStateChanged
@@ -2943,6 +2942,20 @@ public class PosScreen extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_showProductButtonActionPerformed
 
+    private void backupDateItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupDateItemActionPerformed
+        // TODO add your handling code here:
+        Backup backup = new Backup();
+        String fileName = backup.backUpData();
+
+        if (fileName == null) {
+            JOptionPane.showMessageDialog(selectionPanel, "DB_SERVER_PATH: VARIABLE MAY NOT SET!");
+        } else {
+            JOptionPane.showMessageDialog(selectionPanel, "DB BACKUP CREATED!");
+        }
+
+
+    }//GEN-LAST:event_backupDateItemActionPerformed
+
     private void updateSellReportView() {
 
         shopBalances = shopService.getShopBalances(shops);
@@ -3106,7 +3119,6 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
@@ -3169,7 +3181,6 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JTextField psNameField;
     private javax.swing.JTextField psQuantityField;
     private javax.swing.JTextField psSellRateField;
-    private javax.swing.JTextField quantityCodeField;
     private javax.swing.JButton removeOtItemButton;
     private javax.swing.JPanel reportPanel;
     private javax.swing.JButton reset;
