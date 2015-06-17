@@ -2157,14 +2157,14 @@ public class PosScreen extends javax.swing.JFrame {
                     .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                     .addComponent(distShopCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel10Layout.createSequentialGroup()
                         .addComponent(jLabel47)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(supplierBuyRateField))
+                        .addComponent(supplierBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel52, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(distSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2879,7 +2879,6 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         jButton9.setEnabled(false);
         jButton10.setEnabled(false);
-        
 
         JTabbedPane tabbedPane = (JTabbedPane) evt.getSource();
         int index = tabbedPane.getSelectedIndex();
@@ -3681,7 +3680,6 @@ public class PosScreen extends javax.swing.JFrame {
         int indx = distProductNameCB.getSelectedIndex();
         Double sellRate = 0.0;
         Double buyRate = 0.0;
-
         if (indx != Enum.invalidIndex) {
             SOPIndex sopIndex = sopIndexs.get(indx);
             SupplierOrderProduct sop = search.searchSupplierOrderProduct(suppliers, sopIndex);
@@ -3690,23 +3688,17 @@ public class PosScreen extends javax.swing.JFrame {
                 buyRate = Double.parseDouble(supplierBuyRateField.getText());
             } catch (NumberFormatException nfe) {
                 System.out.println(nfe.getMessage());
-
             }
-
             if (sellRate < sop.getSupplierRate()) {
                 JOptionPane.showMessageDialog(null, "Please set the sell rate");
             } else {
-
                 int shopIndex = distShopCB.getSelectedIndex();
                 Shop shop = shops.get(shopIndex);
-
                 int quantity = Integer.parseInt(distQuantityCB.getSelectedItem().toString());
-                if (quantity > 0) {
-
-                    Product prevProduct = productService.previousProductQuantityInShop(sop.getSupplierProductId(), shop.getShopId());
-                    System.out.println("Previous Quantity:" + prevProduct);
-
-                    if (prevProduct == null) {
+                Product prevProduct = productService.previousProductQuantityInShop(sop.getSupplierProductId(), shop.getShopId());
+                System.out.println("Previous Quantity:" + prevProduct);
+                if (prevProduct == null) {
+                    if (quantity > 0) {
                         Product product = new Product();
                         product.setProductBarcode(idBuilder.geProductUniqueID());
                         product.setProductBuyRate(buyRate);
@@ -3717,35 +3709,35 @@ public class PosScreen extends javax.swing.JFrame {
                         product.setProductInfoUpdated(DateUtil.convertDateToTimestamp(new Date()));
                         product.setSupplierProductId(sop.getSupplierProductId());
                         System.out.println(product);
-
                         int savedId = productService.saveProduct(product);
                         if (savedId != Enum.invalidIndex) {
                             quantity = currentSupplierOrderProductQuantity(sop);
                             supplierAdder.refreshQuantityList(distQuantityCB, quantity);
-
                             shopDistributedProducts = productService.getDistributedProducts(sop.getSupplierProductId());
                             productAdder.addDistributedProductsInStockView(shopDistributedProducts, productSuppliedTable);
-
                             System.out.println("Product Distributed!");
                         }
-
                     } else {
-                        int newStock = quantity + prevProduct.getProductStock();
-                        prevProduct.setProductStock(newStock);
+                        JOptionPane.showMessageDialog(null, "Please select minimum stock!");
+                    }
+                } else {
+                    int newStock = quantity + prevProduct.getProductStock();
+                    prevProduct.setProductStock(newStock);
+                    prevProduct.setProductSellRate(sellRate);
+                    prevProduct.setProductBuyRate(buyRate);
+                    int option = JOptionPane.showConfirmDialog(null, "Sure to update  stock, sell rate, buy rate!");
+                    if (option == JOptionPane.YES_OPTION) {
                         boolean status = productService.updateProduct(prevProduct);
                         if (status) {
                             quantity = currentSupplierOrderProductQuantity(sop);
                             supplierAdder.refreshQuantityList(distQuantityCB, quantity);
-
                             shopDistributedProducts = productService.getDistributedProducts(sop.getSupplierProductId());
                             productAdder.addDistributedProductsInStockView(shopDistributedProducts, productSuppliedTable);
-
                             System.out.println("Product Updated!");
                         }
                     }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please select minimum stock!");
                 }
+
             }
         }
     }//GEN-LAST:event_jButton16ActionPerformed

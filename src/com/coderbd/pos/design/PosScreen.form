@@ -2834,16 +2834,16 @@
                                           <Component id="distShopCB" alignment="0" max="32767" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" attributes="0">
                                               <Component id="jLabel47" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="supplierBuyRateField" max="32767" attributes="0"/>
+                                              <Component id="supplierBuyRateField" min="-2" pref="114" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="jLabel52" min="-2" pref="94" max="-2" attributes="0"/>
                                           <Component id="distSellRateField" min="-2" pref="182" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <EmptySpace pref="77" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
