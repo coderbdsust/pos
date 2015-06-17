@@ -39,7 +39,7 @@ public class Valid {
 
         for (int i = 0; i < username.length(); i++) {
             char ch = username.charAt(i);
-            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) {
                 alpha = true;
             } else if (ch == '.' || ch == '-' || ch == ' ') {
             } else {

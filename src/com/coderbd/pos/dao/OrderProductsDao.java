@@ -5,6 +5,7 @@
  */
 package com.coderbd.pos.dao;
 
+import com.coderbd.pos.constraints.Enum;
 import com.coderbd.pos.entity.CustomerOrder;
 import com.coderbd.pos.entity.OrderProduct;
 import java.sql.ResultSet;
@@ -83,6 +84,24 @@ public class OrderProductsDao {
         } catch (DataAccessException dae) {
             System.out.println(dae.getMessage());
             return false;
+        }
+
+    }
+
+    public int countProductSoldQuantity(int supplierProductId) {
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        param.addValue("supplier_product_id", supplierProductId);
+
+        String query = "select sum(order_product_quantity) as sold_stock from pos.order_products \n"
+                + "where product_id in (select product_id from pos.products where supplier_product_id=:supplier_product_id) group by product_id";
+        try {
+            return jdbc.queryForObject(query, param, Integer.class);
+        } catch (CannotGetJdbcConnectionException conExp) {
+            System.out.println(conExp.getMessage());
+            return Enum.invalidIndex;
+        } catch (DataAccessException dae) {
+            System.out.println(dae.getMessage());
+            return Enum.invalidIndex;
         }
 
     }

@@ -16,8 +16,17 @@ import com.coderbd.pos.entity.ExpenseCategory;
 import com.coderbd.pos.entity.OrderProduct;
 import com.coderbd.pos.entity.Product;
 import com.coderbd.pos.entity.Shop;
+import com.coderbd.pos.entity.Supplier;
+import com.coderbd.pos.entity.SupplierOrder;
+import com.coderbd.pos.entity.SupplierOrderProduct;
 import com.coderbd.pos.entity.User;
+import com.coderbd.pos.entity.pojo.ShopBalance;
+import com.coderbd.pos.entity.pojo.ShopExpense;
+import com.coderbd.pos.entity.pojo.ShopOrder;
+import com.coderbd.pos.entity.pojo.SupplierOrderProductReport;
+import com.coderbd.pos.entity.pojo.SupplierOrderReport;
 import com.coderbd.pos.pdf.BarcodePdf;
+import com.coderbd.pos.pdf.CodePDF;
 import com.coderbd.pos.pdf.OrderFileBuilder;
 import com.coderbd.pos.print.Printer;
 import com.coderbd.pos.print.PrinterLookUp;
@@ -26,34 +35,44 @@ import com.coderbd.pos.service.ProductService;
 import com.coderbd.pos.service.ShopExpenseService;
 import com.coderbd.pos.service.ShopOwnerService;
 import com.coderbd.pos.service.ShopService;
+import com.coderbd.pos.service.SupplierOrderPaymentService;
+import com.coderbd.pos.service.SupplierOrderService;
+import com.coderbd.pos.service.SupplierProductService;
+import com.coderbd.pos.service.SupplierReturnProductService;
+import com.coderbd.pos.service.SupplierService;
 import com.coderbd.pos.service.UserService;
-import com.coderbd.pos.utils.DeveloperHelper;
-import com.coderbd.pos.utils.ExpenseAdder;
-import com.coderbd.pos.utils.IDBuilder;
-import com.coderbd.pos.utils.ManagerHelper;
-import com.coderbd.pos.utils.OrderProductAdder;
-import com.coderbd.pos.utils.ProductAdder;
-import com.coderbd.pos.utils.ReceiptIndent;
-import com.coderbd.pos.utils.ResetTable;
-import com.coderbd.pos.utils.Search;
-import com.coderbd.pos.utils.SellReportAdder;
-import com.coderbd.pos.entity.pojo.ShopBalance;
-import com.coderbd.pos.entity.pojo.ShopExpense;
-import com.coderbd.pos.entity.pojo.ShopOrder;
 import com.coderbd.pos.utils.DateUtil;
-import com.coderbd.pos.utils.ShopOrderAdder;
+import com.coderbd.pos.utils.DeveloperHelper;
+import com.coderbd.pos.utils.IDBuilder;
+import com.coderbd.pos.utils.ReceiptIndent;
+import com.coderbd.pos.utils.Reset;
+import com.coderbd.pos.utils.Search;
 import com.coderbd.pos.utils.StaffHelper;
+import com.coderbd.pos.utils.adder.ExpenseAdder;
+import com.coderbd.pos.utils.adder.OrderProductAdder;
+import com.coderbd.pos.utils.adder.ProductAdder;
+import com.coderbd.pos.utils.adder.SellReportAdder;
+import com.coderbd.pos.utils.adder.ShopOrderAdder;
+import com.coderbd.pos.utils.adder.SupplierAdder;
+import com.coderbd.pos.utils.adder.SupplierOrderProductReportAdder;
+import com.coderbd.pos.utils.index.SOPIndex;
 import com.coderbd.pos.validation.Valid;
 
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.PrintService;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -77,17 +96,23 @@ public class PosScreen extends javax.swing.JFrame {
     private ShopExpenseService shopExpenseService;
     private CustomerOrderService customerOrderService;
 
+    private SupplierService supplierService;
+    private SupplierOrderService supplierOrderService;
+    private SupplierProductService supplierProductService;
+    private SupplierOrderPaymentService supplierOrderPaymentService;
+    private SupplierReturnProductService supplierReturnProductService;
+
     private DeveloperHelper devHelper;
-    private ManagerHelper manHelper;
+
     private StaffHelper staffHelper;
-    private ResetTable resetTable;
+    private Reset resetTable;
 
     private PanelSlider panelSlider;
     private Valid loginValidation;
     private ProductAdder productAdder;
     private OrderProductAdder orderProductAdder;
     private SellReportAdder sellReportAdder;
-
+    private SupplierAdder supplierAdder;
     private ExpenseAdder expenseAdder;
     private ShopOrderAdder shopOrderAdder;
     private IDBuilder idBuilder;
@@ -102,6 +127,9 @@ public class PosScreen extends javax.swing.JFrame {
     /*Selected Shop's Category wise expenditures*/
     private List<ShopExpense> shopExpenses;
     private List<ShopOrder> shopOrders;
+    /*All available suppliers*/
+    private List<Supplier> suppliers;
+    private List<SOPIndex> sopIndexs;
     /*Login User Info*/
     private User user;
     /*User selected shop*/
@@ -127,11 +155,10 @@ public class PosScreen extends javax.swing.JFrame {
         panelSlider = new PanelSlider();
         loginValidation = new Valid();
         devHelper = new DeveloperHelper();
-        manHelper = new ManagerHelper();
         staffHelper = new StaffHelper();
         productAdder = new ProductAdder();
         expenseAdder = new ExpenseAdder();
-        resetTable = new ResetTable();
+        resetTable = new Reset();
         idBuilder = new IDBuilder();
         orderProductAdder = new OrderProductAdder();
         search = new Search();
@@ -139,10 +166,12 @@ public class PosScreen extends javax.swing.JFrame {
         shopOrderAdder = new ShopOrderAdder();
         reciptIndent = new ReceiptIndent();
         sellReportAdder = new SellReportAdder();
+        supplierAdder = new SupplierAdder();
     }
 
     public void initUI() {
         logoutItem.setEnabled(false);
+        optionItem.setEnabled(false);
         backupDateItem.setEnabled(false);
         panelSlider.changeThePanel(mainPanel, loginPanel);
     }
@@ -163,6 +192,12 @@ public class PosScreen extends javax.swing.JFrame {
             productService = (ProductService) appContext.getBean("productService");
             shopExpenseService = (ShopExpenseService) appContext.getBean("shopExpenseService");
             customerOrderService = (CustomerOrderService) appContext.getBean("customerOrderService");
+
+            supplierService = (SupplierService) appContext.getBean("supplierService");
+            supplierOrderService = (SupplierOrderService) appContext.getBean("supplierOrderService");
+            supplierProductService = (SupplierProductService) appContext.getBean("supplierProductService");
+            supplierOrderPaymentService = (SupplierOrderPaymentService) appContext.getBean("supplierOrderPaymentService");
+            supplierReturnProductService = (SupplierReturnProductService) appContext.getBean("supplierReturnProductService");
         }
     }
 
@@ -273,19 +308,6 @@ public class PosScreen extends javax.swing.JFrame {
         orderViewPanel = new javax.swing.JPanel();
         orderViewScroll = new javax.swing.JScrollPane();
         orderViewTable = new javax.swing.JTable();
-        barcodeGenerationPanel = new javax.swing.JPanel();
-        barcodeInputPanel = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
-        previousCodeField = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        barcodeQuantityLabel = new javax.swing.JLabel();
-        barcodeTKField = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        barcodeSimulatePanel = new javax.swing.JPanel();
-        bcodeGenButton = new javax.swing.JButton();
-        barcodeViewPanel = new javax.swing.JPanel();
-        barcodeInfoLabel = new javax.swing.JLabel();
-        barcodeViewField = new javax.swing.JTextField();
         managerPanel = new javax.swing.JPanel();
         managerTab = new javax.swing.JTabbedPane();
         managerShopStockPanel = new javax.swing.JPanel();
@@ -327,38 +349,18 @@ public class PosScreen extends javax.swing.JFrame {
         jPanel7 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
-        cancelOrderField = new javax.swing.JTextField();
+        OrderIDCodeField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         completeOrderTable = new javax.swing.JTable();
-        reportPanel = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jButton17 = new javax.swing.JButton();
-        sellReportAllShopCB = new javax.swing.JComboBox();
-        sellDateFrom = new com.toedter.calendar.JDateChooser();
-        sellDateTo = new com.toedter.calendar.JDateChooser();
-        jLabel31 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        totalSellLabel = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        totalPaidLabel = new javax.swing.JLabel();
-        jLabel43 = new javax.swing.JLabel();
-        totalDueLabel = new javax.swing.JLabel();
-        jLabel45 = new javax.swing.JLabel();
-        totalProfitLabel = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        sellReportTable = new javax.swing.JTable();
         selectionPanel = new javax.swing.JPanel();
         shopSelectionEnclosedPanel = new javax.swing.JPanel();
         openShopButton = new javax.swing.JButton();
-        createNewShopButton = new javax.swing.JButton();
         shopSelectCB = new javax.swing.JComboBox();
         shopSelectErrorLabel = new javax.swing.JLabel();
-        addNewStaffButton = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         loginPanel = new javax.swing.JPanel();
         logPanelEnclosed = new javax.swing.JPanel();
         usernameLabel = new javax.swing.JLabel();
@@ -396,9 +398,83 @@ public class PosScreen extends javax.swing.JFrame {
         shopCB = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
+        optionPanel = new javax.swing.JPanel();
+        productSellButton = new javax.swing.JButton();
+        supplierButton = new javax.swing.JButton();
+        addNewStaffButton = new javax.swing.JButton();
+        createNewShopButton = new javax.swing.JButton();
+        reportButton = new javax.swing.JButton();
+        supplierDetailsPanel = new javax.swing.JPanel();
+        supplyViewPanel = new javax.swing.JPanel();
+        supplierTabPanned = new javax.swing.JTabbedPane();
+        supplyOrderEntryPanel = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        supplierCB = new javax.swing.JComboBox();
+        jButton12 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        supplierOrderDate = new com.toedter.calendar.JDateChooser();
+        jLabel34 = new javax.swing.JLabel();
+        jLabel41 = new javax.swing.JLabel();
+        supplierTotalBillLabel = new javax.swing.JLabel();
+        jLabel46 = new javax.swing.JLabel();
+        supplierTotalPaidLabel = new javax.swing.JLabel();
+        jLabel48 = new javax.swing.JLabel();
+        supplierTotalDueLabel = new javax.swing.JLabel();
+        jButton18 = new javax.swing.JButton();
+        orderProductSellButton = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        supplierTable = new javax.swing.JTable();
+        supplyProductDistPanel = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        distSupplierNameCB = new javax.swing.JComboBox();
+        distProductNameCB = new javax.swing.JComboBox();
+        distQuantityCB = new javax.swing.JComboBox();
+        jLabel44 = new javax.swing.JLabel();
+        jLabel49 = new javax.swing.JLabel();
+        distShopCB = new javax.swing.JComboBox();
+        jLabel50 = new javax.swing.JLabel();
+        jLabel51 = new javax.swing.JLabel();
+        distSellRateField = new javax.swing.JTextField();
+        jButton16 = new javax.swing.JButton();
+        jLabel52 = new javax.swing.JLabel();
+        jLabel47 = new javax.swing.JLabel();
+        supplyBarcodeLabel = new javax.swing.JButton();
+        fixedRateCkB = new javax.swing.JCheckBox();
+        supplierBuyRateField = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        productSuppliedTable = new javax.swing.JTable();
+        annualReportPanel = new javax.swing.JPanel();
+        reportToolBarPanel = new javax.swing.JPanel();
+        jButton11 = new javax.swing.JButton();
+        reportViewPanel = new javax.swing.JPanel();
+        reportTabbedPane = new javax.swing.JTabbedPane();
+        reportPanel = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jButton17 = new javax.swing.JButton();
+        sellReportAllShopCB = new javax.swing.JComboBox();
+        sellDateFrom = new com.toedter.calendar.JDateChooser();
+        sellDateTo = new com.toedter.calendar.JDateChooser();
+        jLabel31 = new javax.swing.JLabel();
+        jLabel32 = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        totalSellLabel = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        totalPaidLabel = new javax.swing.JLabel();
+        jLabel43 = new javax.swing.JLabel();
+        totalDueLabel = new javax.swing.JLabel();
+        jLabel45 = new javax.swing.JLabel();
+        totalProfitLabel = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        sellReportTable = new javax.swing.JTable();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         logoutItem = new javax.swing.JMenuItem();
+        optionItem = new javax.swing.JMenuItem();
         exitItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
         backupDateItem = new javax.swing.JMenuItem();
@@ -408,7 +484,7 @@ public class PosScreen extends javax.swing.JFrame {
         aboutItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(920, 620));
+        setPreferredSize(new java.awt.Dimension(950, 650));
         getContentPane().setLayout(new java.awt.CardLayout());
 
         mainPanel.setLayout(new java.awt.CardLayout());
@@ -558,7 +634,7 @@ public class PosScreen extends javax.swing.JFrame {
                 .addGroup(signBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(shopNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                     .addComponent(shopAddressLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 387, Short.MAX_VALUE)
                 .addGroup(signBoardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(signBoardPanelLayout.createSequentialGroup()
                         .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -866,115 +942,6 @@ public class PosScreen extends javax.swing.JFrame {
 
         userTabPanel.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=30 marginheight=3>Customer Order</body></html>", customerOrderPanel);
 
-        barcodeGenerationPanel.setLayout(new java.awt.BorderLayout());
-
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel10.setText("Previous Barcode");
-
-        jLabel3.setText("KEEP BLANK FOR GENERATING NEW BARCODE");
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel7.setText("Amount");
-
-        javax.swing.GroupLayout barcodeInputPanelLayout = new javax.swing.GroupLayout(barcodeInputPanel);
-        barcodeInputPanel.setLayout(barcodeInputPanelLayout);
-        barcodeInputPanelLayout.setHorizontalGroup(
-            barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(previousCodeField, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                    .addComponent(barcodeTKField))
-                .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                        .addGap(426, 426, 426)
-                        .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        barcodeInputPanelLayout.setVerticalGroup(
-            barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barcodeInputPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(previousCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(22, 22, 22)
-                .addGroup(barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barcodeInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(barcodeTKField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(barcodeQuantityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        barcodeGenerationPanel.add(barcodeInputPanel, java.awt.BorderLayout.PAGE_START);
-
-        bcodeGenButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        bcodeGenButton.setText("Generate Barcode");
-        bcodeGenButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bcodeGenButtonActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout barcodeSimulatePanelLayout = new javax.swing.GroupLayout(barcodeSimulatePanel);
-        barcodeSimulatePanel.setLayout(barcodeSimulatePanelLayout);
-        barcodeSimulatePanelLayout.setHorizontalGroup(
-            barcodeSimulatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bcodeGenButton, javax.swing.GroupLayout.DEFAULT_SIZE, 1037, Short.MAX_VALUE)
-        );
-        barcodeSimulatePanelLayout.setVerticalGroup(
-            barcodeSimulatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barcodeSimulatePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(bcodeGenButton, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        barcodeGenerationPanel.add(barcodeSimulatePanel, java.awt.BorderLayout.PAGE_END);
-
-        barcodeInfoLabel.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-
-        barcodeViewField.setBackground(new java.awt.Color(255, 102, 51));
-        barcodeViewField.setFont(new java.awt.Font("Tahoma", 1, 30)); // NOI18N
-        barcodeViewField.setEditable(false);
-
-        javax.swing.GroupLayout barcodeViewPanelLayout = new javax.swing.GroupLayout(barcodeViewPanel);
-        barcodeViewPanel.setLayout(barcodeViewPanelLayout);
-        barcodeViewPanelLayout.setHorizontalGroup(
-            barcodeViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barcodeViewPanelLayout.createSequentialGroup()
-                .addGroup(barcodeViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(barcodeViewPanelLayout.createSequentialGroup()
-                        .addGap(159, 159, 159)
-                        .addComponent(barcodeInfoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(barcodeViewPanelLayout.createSequentialGroup()
-                        .addGap(313, 313, 313)
-                        .addComponent(barcodeViewField, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(278, Short.MAX_VALUE))
-        );
-        barcodeViewPanelLayout.setVerticalGroup(
-            barcodeViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barcodeViewPanelLayout.createSequentialGroup()
-                .addGap(87, 87, 87)
-                .addComponent(barcodeViewField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(90, 90, 90)
-                .addComponent(barcodeInfoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(193, Short.MAX_VALUE))
-        );
-
-        barcodeGenerationPanel.add(barcodeViewPanel, java.awt.BorderLayout.CENTER);
-
-        userTabPanel.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Barcode Generation</body></html>", barcodeGenerationPanel);
-
         managerPanel.setLayout(new java.awt.CardLayout());
 
         managerTab.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -1102,7 +1069,7 @@ public class PosScreen extends javax.swing.JFrame {
                 java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true, true, true, true, false
+                false, false, false, false, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -1147,13 +1114,19 @@ public class PosScreen extends javax.swing.JFrame {
         jLabel27.setText("Expense Category");
 
         jLabel28.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel28.setText("Description");
+        jLabel28.setText("Date");
 
         jLabel29.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel29.setText("Amount");
 
+        expDescField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                expDescFieldActionPerformed(evt);
+            }
+        });
+
         jLabel30.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel30.setText("Date");
+        jLabel30.setText("Description");
 
         expCategoryCB.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         expCategoryCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "BANK", "SUPPLIER" }));
@@ -1190,7 +1163,7 @@ public class PosScreen extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(expDescField, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                        .addComponent(expDate, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(expAmountField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
@@ -1198,20 +1171,21 @@ public class PosScreen extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 168, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(categoryExpenseTotalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                            .addComponent(jLabel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(406, 406, 406))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(categoryExpenseTotalLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(expDate, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
+                        .addComponent(expDescField, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveExpenseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(expenditureDeleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(73, 73, 73)))
-                .addContainerGap())
+                        .addGap(170, 170, 170))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1229,8 +1203,8 @@ public class PosScreen extends javax.swing.JFrame {
                         .addComponent(expAmountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(saveExpenseButton)
                         .addComponent(expenditureDeleteButton)
-                        .addComponent(expDescField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(expCategoryCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(expCategoryCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(expDescField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(categoryExpenseTotalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1303,6 +1277,14 @@ public class PosScreen extends javax.swing.JFrame {
             }
         });
 
+        jButton8.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButton8.setText("Order Details");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -1313,10 +1295,12 @@ public class PosScreen extends javax.swing.JFrame {
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelOrderField, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(42, 42, 42)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE))
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(OrderIDCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
@@ -1326,14 +1310,15 @@ public class PosScreen extends javax.swing.JFrame {
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cancelOrderField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(30, 30, 30))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                            .addComponent(OrderIDCodeField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel7Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1381,162 +1366,6 @@ public class PosScreen extends javax.swing.JFrame {
 
         managerTab.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Order View</body></html>", oldOrderViewPanel);
 
-        reportPanel.setLayout(new java.awt.BorderLayout());
-
-        jPanel4.setPreferredSize(new java.awt.Dimension(768, 90));
-
-        jButton17.setText("Show");
-        jButton17.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton17ActionPerformed(evt);
-            }
-        });
-
-        sellReportAllShopCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All Shop", "The New Chitra Boutiques" }));
-        sellReportAllShopCB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sellReportAllShopCBActionPerformed(evt);
-            }
-        });
-
-        jLabel31.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel31.setText("From");
-
-        jLabel32.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel32.setText("To");
-
-        jLabel33.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel33.setText("Select Report Pattern");
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel4.setText("Total Sell");
-
-        totalSellLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        totalSellLabel.setText("0.0");
-
-        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel8.setText("Total Paid");
-
-        totalPaidLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        totalPaidLabel.setText("0.0");
-
-        jLabel43.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel43.setText("Total Due");
-
-        totalDueLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        totalDueLabel.setText("0.0");
-
-        jLabel45.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel45.setText("Total Profit");
-
-        totalProfitLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        totalProfitLabel.setText("0.0");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sellReportAllShopCB, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel33))
-                        .addGap(22, 22, 22)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(totalPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel43)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(totalDueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(sellDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel32, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(sellDateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(totalProfitLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(totalSellLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel8)
-                        .addGap(533, 533, 533)))
-                .addContainerGap(203, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel32)
-                    .addComponent(jLabel31)
-                    .addComponent(jLabel33))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sellDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton17)
-                        .addComponent(sellReportAllShopCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(sellDateTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel45, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(totalSellLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(totalPaidLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel43, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(totalDueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(totalProfitLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        reportPanel.add(jPanel4, java.awt.BorderLayout.PAGE_START);
-
-        jPanel5.setLayout(new java.awt.CardLayout());
-
-        sellReportTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "Shop Name", "Date", "Daily Sell", "Daily Paid", "Daily Due", "Profit"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        sellReportTable.getTableHeader().setReorderingAllowed(false);
-        jScrollPane2.setViewportView(sellReportTable);
-
-        jPanel5.add(jScrollPane2, "card2");
-
-        reportPanel.add(jPanel5, java.awt.BorderLayout.CENTER);
-
-        managerTab.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Sell Report</body></html>", reportPanel);
-
         managerPanel.add(managerTab, "card2");
 
         userTabPanel.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Maintenance</body></html>", managerPanel);
@@ -1550,6 +1379,8 @@ public class PosScreen extends javax.swing.JFrame {
         selectionPanel.setLayout(new java.awt.GridBagLayout());
 
         shopSelectionEnclosedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Select Shop", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 22))); // NOI18N
+        shopSelectionEnclosedPanel.setMinimumSize(new java.awt.Dimension(500, 200));
+        shopSelectionEnclosedPanel.setPreferredSize(new java.awt.Dimension(550, 200));
 
         openShopButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         openShopButton.setText("Open");
@@ -1559,25 +1390,17 @@ public class PosScreen extends javax.swing.JFrame {
             }
         });
 
-        createNewShopButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        createNewShopButton.setText("New Shop");
-        createNewShopButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createNewShopButtonActionPerformed(evt);
-            }
-        });
-
         shopSelectCB.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         shopSelectCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "The New Chitra Boutiques", "Chitra Boutiques" }));
 
         shopSelectErrorLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         shopSelectErrorLabel.setForeground(new java.awt.Color(255, 0, 0));
 
-        addNewStaffButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        addNewStaffButton.setText("Add New Staff");
-        addNewStaffButton.addActionListener(new java.awt.event.ActionListener() {
+        jButton7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButton7.setText("Back");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addNewStaffButtonActionPerformed(evt);
+                jButton7ActionPerformed(evt);
             }
         });
 
@@ -1588,13 +1411,11 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(shopSelectionEnclosedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shopSelectCB, 0, 819, Short.MAX_VALUE)
+                    .addComponent(shopSelectCB, 0, 602, Short.MAX_VALUE)
                     .addComponent(shopSelectErrorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(shopSelectionEnclosedPanelLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(addNewStaffButton, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(createNewShopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(openShopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -1608,11 +1429,9 @@ public class PosScreen extends javax.swing.JFrame {
                 .addComponent(shopSelectErrorLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(shopSelectionEnclosedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(shopSelectionEnclosedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(openShopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(createNewShopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(addNewStaffButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(openShopButton, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                    .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1852,7 +1671,7 @@ public class PosScreen extends javax.swing.JFrame {
             .addGroup(accountCreatePanelLayout.createSequentialGroup()
                 .addGap(64, 64, 64)
                 .addComponent(acpEnclosedPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addContainerGap(145, Short.MAX_VALUE))
         );
 
         mainPanel.add(accountCreatePanel, "card5");
@@ -1935,6 +1754,690 @@ public class PosScreen extends javax.swing.JFrame {
 
         mainPanel.add(staffAddPanel, "card7");
 
+        optionPanel.setMinimumSize(new java.awt.Dimension(0, 0));
+        optionPanel.setPreferredSize(new java.awt.Dimension(900, 650));
+        optionPanel.setLayout(new java.awt.GridBagLayout());
+
+        productSellButton.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        productSellButton.setText("Shop Order");
+        productSellButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                productSellButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 135;
+        gridBagConstraints.ipady = 92;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 0);
+        optionPanel.add(productSellButton, gridBagConstraints);
+
+        supplierButton.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        supplierButton.setText("Supplier");
+        supplierButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                supplierButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.ipadx = 209;
+        gridBagConstraints.ipady = 92;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 10);
+        optionPanel.add(supplierButton, gridBagConstraints);
+
+        addNewStaffButton.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        addNewStaffButton.setText("New Staff");
+        addNewStaffButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addNewStaffButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.ipadx = 169;
+        gridBagConstraints.ipady = 93;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 38, 0);
+        optionPanel.add(addNewStaffButton, gridBagConstraints);
+
+        createNewShopButton.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        createNewShopButton.setText("New Shop");
+        createNewShopButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createNewShopButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.ipadx = 163;
+        gridBagConstraints.ipady = 93;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 38, 10);
+        optionPanel.add(createNewShopButton, gridBagConstraints);
+
+        reportButton.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        reportButton.setText("Report");
+        reportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reportButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 403;
+        gridBagConstraints.ipady = 93;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(11, 148, 0, 0);
+        optionPanel.add(reportButton, gridBagConstraints);
+
+        mainPanel.add(optionPanel, "card8");
+
+        supplierDetailsPanel.setPreferredSize(new java.awt.Dimension(960, 650));
+        supplierDetailsPanel.setLayout(new java.awt.CardLayout());
+
+        supplyViewPanel.setPreferredSize(new java.awt.Dimension(950, 587));
+        supplyViewPanel.setLayout(new java.awt.CardLayout());
+
+        supplierTabPanned.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                supplierTabPannedStateChanged(evt);
+            }
+        });
+
+        supplyOrderEntryPanel.setLayout(new java.awt.BorderLayout());
+
+        jPanel6.setPreferredSize(new java.awt.Dimension(950, 125));
+
+        supplierCB.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        supplierCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fashion Park", "Rahim Garments", "Harami Garments" }));
+        supplierCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                supplierCBActionPerformed(evt);
+            }
+        });
+
+        jButton12.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jButton12.setText("Add New Supplier");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+
+        jButton14.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jButton14.setText("New Order");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
+        jButton15.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jButton15.setText("Update Order");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+
+        jLabel34.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel34.setText("New Order Date");
+
+        jLabel41.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel41.setText("Total Bill:");
+
+        supplierTotalBillLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        supplierTotalBillLabel.setText("0.0");
+
+        jLabel46.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel46.setText("Total Paid :");
+
+        supplierTotalPaidLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        supplierTotalPaidLabel.setText("0.0");
+
+        jLabel48.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel48.setText("Total Due :");
+
+        supplierTotalDueLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        supplierTotalDueLabel.setText("0.0");
+
+        jButton18.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        jButton18.setText("Cancel Order");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton18ActionPerformed(evt);
+            }
+        });
+
+        orderProductSellButton.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        orderProductSellButton.setText("Product Sell Report");
+        orderProductSellButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                orderProductSellButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel41)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(supplierTotalBillLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(supplierCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton12, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(supplierTotalPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel48, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(supplierOrderDate, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jButton18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(orderProductSellButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(supplierTotalDueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(112, Short.MAX_VALUE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel6Layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(supplierCB)
+                    .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(supplierOrderDate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel46)
+                            .addComponent(supplierTotalPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel48))
+                        .addGap(13, 13, 13))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton18, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(orderProductSellButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel41, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(supplierTotalBillLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())))
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(99, 99, 99)
+                .addComponent(supplierTotalDueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        supplyOrderEntryPanel.add(jPanel6, java.awt.BorderLayout.PAGE_START);
+
+        jPanel9.setLayout(new java.awt.CardLayout(5, 2));
+
+        supplierTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Date", "Order ID", "Bill", "Paid", "Due"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(supplierTable);
+
+        jPanel9.add(jScrollPane4, "card2");
+
+        supplyOrderEntryPanel.add(jPanel9, java.awt.BorderLayout.CENTER);
+
+        supplierTabPanned.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Supply Order Entry</body></html>", supplyOrderEntryPanel);
+
+        supplyProductDistPanel.setPreferredSize(new java.awt.Dimension(950, 553));
+        supplyProductDistPanel.setLayout(new java.awt.BorderLayout());
+
+        jPanel10.setPreferredSize(new java.awt.Dimension(930, 103));
+
+        distSupplierNameCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fashion Park", "Fashion House" }));
+        distSupplierNameCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                distSupplierNameCBActionPerformed(evt);
+            }
+        });
+
+        distProductNameCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "FashionPark_O1_P1", "FashionPark_O1_P2", "FashionPark_O1_P3", "FashionPark_O1_P4", "FashionPark_O2_P1" }));
+        distProductNameCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                distProductNameCBActionPerformed(evt);
+            }
+        });
+
+        distQuantityCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", " " }));
+        distQuantityCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                distQuantityCBActionPerformed(evt);
+            }
+        });
+
+        jLabel44.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel44.setText("Supplier Name");
+
+        jLabel49.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel49.setText("Product Name");
+
+        distShopCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "The New Chitra Boutiques", "The Fashion Ark" }));
+        distShopCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                distShopCBActionPerformed(evt);
+            }
+        });
+
+        jLabel50.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel50.setText("Quantity");
+
+        jLabel51.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel51.setText("Shop Name");
+
+        distSellRateField.setText("0");
+
+        jButton16.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jButton16.setText("Distribute To Shop");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+
+        jLabel52.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel52.setText("Shop Sell Rate");
+
+        jLabel47.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel47.setText("Buy Rate :");
+
+        supplyBarcodeLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        supplyBarcodeLabel.setText("Generate Barcode");
+        supplyBarcodeLabel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                supplyBarcodeLabelActionPerformed(evt);
+            }
+        });
+
+        fixedRateCkB.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        fixedRateCkB.setText("Fixed Rate Label");
+        fixedRateCkB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixedRateCkBActionPerformed(evt);
+            }
+        });
+
+        supplierBuyRateField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                supplierBuyRateFieldActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel44)
+                            .addComponent(distSupplierNameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(212, 212, 212)
+                        .addComponent(jLabel50))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel49)
+                                .addComponent(distProductNameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(supplyBarcodeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(fixedRateCkB, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                            .addComponent(distQuantityCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel51)
+                    .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                    .addComponent(distShopCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addComponent(jLabel47)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(supplierBuyRateField))
+                    .addComponent(jLabel52, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(distSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel50)
+                            .addComponent(jLabel51)
+                            .addComponent(jLabel52))
+                        .addGap(8, 8, 8)
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(distProductNameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(distQuantityCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(distShopCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(distSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel44)
+                            .addComponent(jLabel49))
+                        .addGap(8, 8, 8)
+                        .addComponent(distSupplierNameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(supplyBarcodeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(fixedRateCkB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel47)
+                        .addComponent(supplierBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+
+        supplyProductDistPanel.add(jPanel10, java.awt.BorderLayout.PAGE_START);
+
+        jPanel11.setLayout(new java.awt.CardLayout(5, 2));
+
+        productSuppliedTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Product Barcode", "Shop Name", "Buy Rate", "Sell Rate", "Shop Stock"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Double.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, true, true, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane5.setViewportView(productSuppliedTable);
+
+        jPanel11.add(jScrollPane5, "card2");
+
+        supplyProductDistPanel.add(jPanel11, java.awt.BorderLayout.CENTER);
+
+        supplierTabPanned.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=3>Supply Product Distribution</body></html>", supplyProductDistPanel);
+
+        supplyViewPanel.add(supplierTabPanned, "card2");
+
+        supplierDetailsPanel.add(supplyViewPanel, "card2");
+
+        mainPanel.add(supplierDetailsPanel, "card9");
+
+        annualReportPanel.setLayout(new java.awt.BorderLayout());
+
+        reportToolBarPanel.setPreferredSize(new java.awt.Dimension(1062, 65));
+
+        jButton11.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButton11.setText("Back");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout reportToolBarPanelLayout = new javax.swing.GroupLayout(reportToolBarPanel);
+        reportToolBarPanel.setLayout(reportToolBarPanelLayout);
+        reportToolBarPanelLayout.setHorizontalGroup(
+            reportToolBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reportToolBarPanelLayout.createSequentialGroup()
+                .addContainerGap(911, Short.MAX_VALUE)
+                .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        reportToolBarPanelLayout.setVerticalGroup(
+            reportToolBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(reportToolBarPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton11, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        annualReportPanel.add(reportToolBarPanel, java.awt.BorderLayout.PAGE_START);
+
+        reportViewPanel.setLayout(new java.awt.CardLayout());
+
+        reportPanel.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setPreferredSize(new java.awt.Dimension(768, 90));
+
+        jButton17.setText("Show");
+        jButton17.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton17ActionPerformed(evt);
+            }
+        });
+
+        sellReportAllShopCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All Shop", "The New Chitra Boutiques" }));
+        sellReportAllShopCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sellReportAllShopCBActionPerformed(evt);
+            }
+        });
+
+        jLabel31.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel31.setText("From");
+
+        jLabel32.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel32.setText("To");
+
+        jLabel33.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel33.setText("Select Report Pattern");
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel4.setText("Total Sell");
+
+        totalSellLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        totalSellLabel.setText("0.0");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel8.setText("Total Paid");
+
+        totalPaidLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        totalPaidLabel.setText("0.0");
+
+        jLabel43.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel43.setText("Total Due");
+
+        totalDueLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        totalDueLabel.setText("0.0");
+
+        jLabel45.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel45.setText("Total Profit");
+
+        totalProfitLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        totalProfitLabel.setText("0.0");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sellReportAllShopCB, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel33))
+                        .addGap(22, 22, 22)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(totalPaidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel43)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(totalDueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sellDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel32, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(sellDateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(totalProfitLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(totalSellLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel8)
+                        .addGap(533, 533, 533)))
+                .addContainerGap(208, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel32)
+                    .addComponent(jLabel31)
+                    .addComponent(jLabel33))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sellDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton17)
+                        .addComponent(sellReportAllShopCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(sellDateTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel45, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(totalSellLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(totalPaidLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel43, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(totalDueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(totalProfitLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        reportPanel.add(jPanel4, java.awt.BorderLayout.PAGE_START);
+
+        jPanel5.setLayout(new java.awt.CardLayout());
+
+        sellReportTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Shop Name", "Date", "Daily Sell", "Daily Paid", "Daily Due", "Profit"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        sellReportTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane2.setViewportView(sellReportTable);
+
+        jPanel5.add(jScrollPane2, "card2");
+
+        reportPanel.add(jPanel5, java.awt.BorderLayout.CENTER);
+
+        reportTabbedPane.addTab("<html><body leftmargin=15 topmargin=8 marginwidth=25 marginheight=2>Sell Report</body></html>", reportPanel);
+
+        reportViewPanel.add(reportTabbedPane, "card2");
+
+        annualReportPanel.add(reportViewPanel, java.awt.BorderLayout.CENTER);
+
+        mainPanel.add(annualReportPanel, "card10");
+
         getContentPane().add(mainPanel, "card2");
 
         fileMenu.setText("File");
@@ -1946,6 +2449,14 @@ public class PosScreen extends javax.swing.JFrame {
             }
         });
         fileMenu.add(logoutItem);
+
+        optionItem.setText("Option");
+        optionItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                optionItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(optionItem);
 
         exitItem.setText("Exit");
         exitItem.addActionListener(new java.awt.event.ActionListener() {
@@ -2011,14 +2522,12 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void openShopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openShopButtonActionPerformed
         // TODO add your handling code here:
+        Reset.resetTable(expenseTable);
         userTabPanel.setSelectedIndex(Enum.firstIndex);
         if (user.getAuthority().equals(Role.USER_STAFF)) {
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, false);
-            managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, false);
         } else if (user.getAuthority().equals(Role.USER_MANAGER)) {
-
             managerTab.setEnabledAt(Enum.MANAGER_TAB_ORDER_VIEW, true);
-            managerTab.setEnabledAt(Enum.MANAGER_TAB_SELL_REPORT, true);
         }
 
         resetTable.resetTable(orderViewTable);
@@ -2087,15 +2596,21 @@ public class PosScreen extends javax.swing.JFrame {
                     }
 
                     if (user.getAuthority().equals(Role.USER_STAFF)) {
-                        createNewShopButton.setEnabled(false);
+
+                        supplierButton.setEnabled(false);
+                        reportButton.setEnabled(false);
                         addNewStaffButton.setEnabled(false);
+                        createNewShopButton.setEnabled(false);
                     } else {
+                        supplierButton.setEnabled(true);
+                        reportButton.setEnabled(true);
                         addNewStaffButton.setEnabled(true);
                         createNewShopButton.setEnabled(true);
                     }
 
-                    panelSlider.changeThePanel(mainPanel, selectionPanel);
+                    panelSlider.changeThePanel(mainPanel, optionPanel);
                 }
+                optionItem.setEnabled(true);
                 logoutItem.setEnabled(true);
                 backupDateItem.setEnabled(true);
             } else {
@@ -2121,16 +2636,21 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
         usernameField.setText("");
         passwordField.setText("");
+
         panelSlider.changeThePanel(mainPanel, loginPanel);
         logoutItem.setEnabled(false);
+        optionItem.setEnabled(false);
 
         /*Reset Item*/
+        logoutReset();
+    }//GEN-LAST:event_logoutItemActionPerformed
+
+    private void logoutReset() {
         resetTable.resetTable(stockTable);
         resetTable.resetTable(expenseTable);
         resetTable.resetTable(orderViewTable);
         resetTable.resetTable(completeOrderTable);
         resetTable.resetTable(sellReportTable);
-
         shops = null;
         users = null;
         shopBalances = null;
@@ -2141,7 +2661,7 @@ public class PosScreen extends javax.swing.JFrame {
         shop = null;
         shopOrder = null;
         backupDateItem.setEnabled(false);
-    }//GEN-LAST:event_logoutItemActionPerformed
+    }
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
         // TODO add your handling code here:
@@ -2196,7 +2716,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
-        panelSlider.changeThePanel(mainPanel, selectionPanel);
+        panelSlider.changeThePanel(mainPanel, optionPanel);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void addUserButtonACPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addUserButtonACPActionPerformed
@@ -2256,7 +2776,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
-        panelSlider.changeThePanel(mainPanel, selectionPanel);
+        panelSlider.changeThePanel(mainPanel, optionPanel);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void createShopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createShopButtonActionPerformed
@@ -2355,76 +2875,20 @@ public class PosScreen extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_shopAddressFieldActionPerformed
 
-    private void bcodeGenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bcodeGenButtonActionPerformed
-        // TODO add your handling code here:
-//        BarCodeGenerate barcode = new BarCodeGenerate();
-        boolean barcodeGenerate = true;
-        try {
-
-            String productBarcode = previousCodeField.getText();
-
-            if (previousCodeField.getText().replace(" ", "").equals("")) {
-                productBarcode = idBuilder.geProductUniqueID();
-                barcodeQuantityLabel.setText("");
-            } else {
-                if (productBarcode.length() == 13) {
-
-                    if (productBarcode.charAt(0) != '1') {
-                        barcodeQuantityLabel.setForeground(Color.RED);
-                        barcodeQuantityLabel.setText(Message.ERROR_INVALID_BARCODE_ID);
-                        previousCodeField.setText("");
-                        barcodeGenerate = false;
-                    }
-                } else {
-                    barcodeQuantityLabel.setText(Message.ERROR_INVALID_BARCODE_SIZE);
-                    previousCodeField.setText("");
-                    barcodeGenerate = false;
-                }
-            }
-
-            if (barcodeGenerate) {
-                try {
-                    int amount = Integer.parseInt(barcodeTKField.getText());
-                    try {
-                        barcodeViewField.setText(productBarcode);
-                        barcodeInfoLabel.setText(Message.SUCCESS_BARCODE_PDF_CREATED);
-                        BarcodePdf barcodePdf = new BarcodePdf(productBarcode, shop);
-                        barcodePdf.generateBarcodePdf(amount);
-                    } catch (UnsupportedEncodingException ex) {
-                        Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } catch (NumberFormatException nfe) {
-                    System.out.println(nfe.getMessage());
-                    barcodeQuantityLabel.setForeground(Color.RED);
-                    barcodeQuantityLabel.setText(Message.ERROR_INVALID_AMOUNT);
-                }
-            }
-
-        } catch (NumberFormatException nfex) {
-
-            System.out.println(nfex.getMessage());
-            barcodeQuantityLabel.setForeground(Color.RED);
-            barcodeQuantityLabel.setText(Message.ERROR_INVALID_BARCODE_ID);
-        }
-
-    }//GEN-LAST:event_bcodeGenButtonActionPerformed
-
     private void userTabPanelStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_userTabPanelStateChanged
         // TODO add your handling code here:
+        jButton9.setEnabled(false);
+        jButton10.setEnabled(false);
+        
+
         JTabbedPane tabbedPane = (JTabbedPane) evt.getSource();
         int index = tabbedPane.getSelectedIndex();
         System.out.println("User Tab: " + index);
         if (index == Enum.USER_TAB_MANAGER) {
             updateStockView();
             updateOrderView();
-            sellReportAdder.refreshSellReportShops(sellReportAllShopCB, shops);
-            updateSellReportView();
+//            updateSellReportView();
 
-        } else if (index == Enum.USER_TAB_BARCODE_GENERATION) {
-            barcodeInfoLabel.setText("");
-            barcodeViewField.setText("");
-
-            previousCodeField.setText("");
         }
     }//GEN-LAST:event_userTabPanelStateChanged
 
@@ -2605,11 +3069,8 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void managerTabStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_managerTabStateChanged
 //         TODO add your handling code here:
-        JTabbedPane tabbedPane = (JTabbedPane) evt.getSource();
-        int index = tabbedPane.getSelectedIndex();
-        if (index == Enum.MANAGER_TAB_SELL_REPORT) {
-            updateSellReportView();
-        }
+
+
     }//GEN-LAST:event_managerTabStateChanged
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
@@ -2620,7 +3081,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-        String orderCode = cancelOrderField.getText();
+        String orderCode = OrderIDCodeField.getText();
         int orderSelected = Enum.invalidIndex;
 
         if (orderCode != null && orderCode.length() == 13) {
@@ -2825,7 +3286,7 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        String orderCode = cancelOrderField.getText();
+        String orderCode = OrderIDCodeField.getText();
         int shopOrderIndex = -1;
         ShopOrder shopOrder = null;
         if (orderCode != null && orderCode.length() == 13) {
@@ -2861,12 +3322,23 @@ public class PosScreen extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "No Order Record Found with this code : " + orderCode);
-            cancelOrderField.setText("");
+            OrderIDCodeField.setText("");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void stockTablePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_stockTablePropertyChange
         // TODO add your handling code here:
+        /**
+         * Product product = new Product();
+         * product.setProductBarcode(idBuilder.geProductUniqueID());
+         * product.setProductBuyRate(buyRate);
+         * product.setProductSellRate(sellRate);
+         * product.setProductStock(quantity);
+         * product.setProductName(sop.getSupplierProductName());
+         * product.setShopId(shop.getShopId());
+         * product.setProductInfoUpdated(DateUtil.convertDateToTimestamp(new
+         * Date())); product.setSupplierProductId(sop.getSupplierProductId());
+         */
         int productIndex = stockTable.getSelectedRow();
         if (productIndex != Enum.invalidIndex) {
 
@@ -2875,11 +3347,15 @@ public class PosScreen extends javax.swing.JFrame {
 
             dummyProduct.setProductId(product.getProductId());
             dummyProduct.setProductBarcode(product.getProductBarcode());
+            dummyProduct.setSupplierProductId(product.getSupplierProductId());
             dummyProduct.setShopId(shop.getShopId());
+            dummyProduct.setShop(shop);
             dummyProduct.setProductName(((String) stockTable.getValueAt(productIndex, 1)).toUpperCase());
             dummyProduct.setProductStock((int) stockTable.getValueAt(productIndex, 2));
             dummyProduct.setProductBuyRate((double) stockTable.getValueAt(productIndex, 3));
             dummyProduct.setProductSellRate((double) stockTable.getValueAt(productIndex, 4));
+
+            System.out.println("Dummy Product: " + dummyProduct);
 
             boolean productUpdated = false;
 
@@ -2923,10 +3399,21 @@ public class PosScreen extends javax.swing.JFrame {
 
     private void showProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showProductButtonActionPerformed
         // TODO add your handling code here:
-        String productCode = psCodeField.getText();
         int productIndex = Enum.invalidIndex;
+        String productCode = psCodeField.getText();
+        int selected = stockTable.getSelectedRow();
+        String rowCode = "";
+
+        if (selected != Enum.invalidIndex) {
+            rowCode = (String) stockTable.getValueAt(selected, 0);
+        }
+
         if (productCode != null && productCode.length() == 13 && productCode.charAt(0) == '1') {
             productIndex = search.searchProduct(products, productCode);
+        } else {
+            if (!rowCode.equals("")) {
+                productIndex = search.searchProduct(products, rowCode);
+            }
         }
 
         if (productIndex != Enum.invalidIndex) {
@@ -2953,8 +3440,398 @@ public class PosScreen extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(selectionPanel, "DB BACKUP CREATED!");
         }
 
-
     }//GEN-LAST:event_backupDateItemActionPerformed
+
+    private void productSellButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productSellButtonActionPerformed
+        // TODO add your handling code here:
+        panelSlider.changeThePanel(mainPanel, selectionPanel);
+    }//GEN-LAST:event_productSellButtonActionPerformed
+
+    private void optionItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionItemActionPerformed
+        // TODO add your handling code here:
+
+        panelSlider.changeThePanel(mainPanel, optionPanel);
+    }//GEN-LAST:event_optionItemActionPerformed
+
+    private void reportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportButtonActionPerformed
+        // TODO add your handling code here:
+        sellReportAdder.refreshSellReportShops(sellReportAllShopCB, shops);
+        updateSellReportView();
+        panelSlider.changeThePanel(mainPanel, annualReportPanel);
+    }//GEN-LAST:event_reportButtonActionPerformed
+
+    private void supplierButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supplierButtonActionPerformed
+        // TODO add your handling code here:
+        Reset.resetTable(supplierTable);
+        Reset.resetTable(productSuppliedTable);
+        userTabPanel.setSelectedIndex(Enum.firstIndex);
+        this.suppliers = supplierService.getSuppliers(user);
+
+        supplierAdder.refreshSupplierLists(supplierCB, suppliers);
+        if (suppliers != null && suppliers.size() > 0) {
+            Supplier supplier = suppliers.get(0);
+            supplierAdder.refreshSupplierTable(supplier,
+                    supplierTable,
+                    supplierTotalBillLabel,
+                    supplierTotalPaidLabel,
+                    supplierTotalDueLabel);
+        }
+
+//        supplierAdder.refreshSupplierLists(distSupplierNameCB, suppliers);
+        supplierOrderDate.setDate(new Date());
+        panelSlider.changeThePanel(mainPanel, supplierDetailsPanel);
+    }//GEN-LAST:event_supplierButtonActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        panelSlider.changeThePanel(mainPanel, optionPanel);
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        // TODO add your handling code here:
+        String orderCode = OrderIDCodeField.getText();
+        int shopOrderIndex = -1;
+        ShopOrder shopOrder = null;
+        if (orderCode != null && orderCode.length() == 13) {
+            shopOrderIndex = search.searchCustomerOrderFromShopOrder(shopOrders, orderCode);
+
+        } else {
+            shopOrderIndex = completeOrderTable.getSelectedRow();
+        }
+
+        if (shopOrderIndex != Enum.invalidIndex) {
+            shopOrder = shopOrders.get(shopOrderIndex);
+            String viewString = reciptIndent.getIndentedOrder(shopOrder);
+            System.out.println(viewString);
+            JOptionPane.showMessageDialog(this, viewString, "Order Details", JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "No Order Record Found with this code : " + orderCode);
+            OrderIDCodeField.setText("");
+        }
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        // TODO add your handling code here:
+        panelSlider.changeThePanel(mainPanel, optionPanel);
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void openSupplierOrder(Supplier supplier, SupplierOrder supplierOrder) {
+        SupplierOrderFormPanel panel = new SupplierOrderFormPanel(supplierOrder,
+                supplierOrderService,
+                supplierProductService,
+                supplierOrderPaymentService);
+        JDialog dialogView = new JDialog();
+        dialogView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialogView.setContentPane(panel);
+        dialogView.pack();
+        dialogView.setVisible(true);
+    }
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        // TODO add your handling code here:
+
+        int supplierIndex = supplierCB.getSelectedIndex();
+        if (supplierIndex != Enum.invalidIndex) {
+            Supplier supplier = suppliers.get(supplierIndex);
+            Timestamp timestamp = DateUtil.convertDateToTimestamp(supplierOrderDate.getDate());
+            SupplierOrder supplierOrder = new SupplierOrder(supplier, timestamp);
+            int supplierOrderId = supplierOrderService.createSupplierOrder(supplierOrder);
+            if (supplierOrderId != Enum.invalidIndex) {
+                supplierOrder.setSupplierOrderId(supplierOrderId);
+                openSupplierOrder(supplier, supplierOrder);
+                supplier.getSupplierOrders().add(supplierOrder);
+                supplierAdder.refreshSupplierTable(supplier, supplierTable, supplierTotalBillLabel, supplierTotalPaidLabel, supplierTotalDueLabel);
+            } else {
+                JOptionPane.showMessageDialog(null, "New Order Couldn't Created!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Please, select a supplier!");
+        }
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        // TODO add your handling code here:
+        CreateSupplierPanel panel = new CreateSupplierPanel(user, suppliers, supplierService);
+        JDialog dialogView = new JDialog();
+        dialogView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialogView.setContentPane(panel);
+        dialogView.pack();
+        dialogView.setVisible(true);
+
+        supplierAdder.refreshSupplierLists(supplierCB, suppliers);
+
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void supplierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supplierCBActionPerformed
+        // TODO add your handling code here:
+        int supplierSelected = supplierCB.getSelectedIndex();
+        if (supplierSelected != Enum.invalidIndex) {
+            Supplier supplier = suppliers.get(supplierSelected);
+            supplierAdder.refreshSupplierTable(supplier, supplierTable, supplierTotalBillLabel, supplierTotalPaidLabel, supplierTotalDueLabel);
+        }
+    }//GEN-LAST:event_supplierCBActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        // TODO add your handling code here:
+        int supplierIndex = supplierCB.getSelectedIndex();
+        if (supplierIndex != Enum.invalidIndex) {
+            Supplier supplier = suppliers.get(supplierIndex);
+            int supplierOrderIndex = supplierTable.getSelectedRow();
+            if (supplierOrderIndex != Enum.invalidIndex) {
+                SupplierOrder supplierOrder = supplier.getSupplierOrders().get(supplierOrderIndex);
+                openSupplierOrder(supplier, supplierOrder);
+                supplierAdder.refreshSupplierTable(supplier, supplierTable, supplierTotalBillLabel, supplierTotalPaidLabel, supplierTotalDueLabel);
+            } else {
+                System.out.println("Invalid Supplier Order!");
+            }
+        } else {
+            System.out.println("Invalid Supplier!");
+        }
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void supplierTabPannedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_supplierTabPannedStateChanged
+        // TODO add your handling code here:
+        JTabbedPane tabbedPane = (JTabbedPane) evt.getSource();
+        int index = tabbedPane.getSelectedIndex();
+
+        Reset.resetComboBox(distProductNameCB);
+        Reset.resetComboBox(distSupplierNameCB);
+        Reset.resetComboBox(distQuantityCB);
+
+        if (index == Enum.SUPPLIER_TAB_PRODUCT_DISTRIBUTION_VIEW) {
+//            System.out.println("second tab selected!");
+            supplierAdder.refreshSupplierLists(distSupplierNameCB, suppliers);
+
+            if (!suppliers.isEmpty()) {
+                Supplier supplier = suppliers.get(0);
+                sopIndexs = supplierAdder.refreshSupplierProductList(distProductNameCB, supplier, 0);
+                if (!supplier.getSupplierOrders().isEmpty()) {
+                    SupplierOrder so = supplier.getSupplierOrders().get(0);
+                    if (!so.getSupplierProducts().isEmpty()) {
+                        SupplierOrderProduct sop = so.getSupplierProducts().get(0);
+
+                        supplierBuyRateField.setText(String.format("%.2f", sop.getSupplierRate()));
+                        int quantity = currentSupplierOrderProductQuantity(sop);
+                        supplierAdder.refreshQuantityList(distQuantityCB, quantity);
+                    }
+                }
+            }
+            supplierAdder.refreshShopsList(distShopCB, shops);
+
+        }
+    }//GEN-LAST:event_supplierTabPannedStateChanged
+
+    private void expDescFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expDescFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_expDescFieldActionPerformed
+
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+        // TODO add your handling code here:
+        int supplierIndex = supplierCB.getSelectedIndex();
+        if (supplierIndex != Enum.invalidIndex) {
+            Supplier supplier = suppliers.get(supplierIndex);
+            int orderIndex = supplierTable.getSelectedRow();
+            if (orderIndex != Enum.invalidIndex) {
+                SupplierOrder so = supplier.getSupplierOrders().get(orderIndex);
+
+                int option = JOptionPane.showConfirmDialog(null, "Are you sure to cancel the order?");
+
+                if (option == JOptionPane.YES_OPTION) {
+                    boolean orderDeleted = supplierService.deleteSupplierOrder(so);
+                    if (orderDeleted == true) {
+                        supplier.getSupplierOrders().remove(orderIndex);
+                        supplierAdder.refreshSupplierTable(supplier, supplierTable, supplierTotalBillLabel, supplierTotalPaidLabel, supplierTotalDueLabel);
+                    }
+                }
+            }
+        }
+
+    }//GEN-LAST:event_jButton18ActionPerformed
+
+    private void supplyBarcodeLabelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supplyBarcodeLabelActionPerformed
+        // TODO add your handling code here:
+        int rowIndex = productSuppliedTable.getSelectedRow();
+        boolean fixedRateTrue = fixedRateCkB.isSelected();
+        if (rowIndex != Enum.invalidIndex) {
+
+            Product product = shopDistributedProducts.get(rowIndex);
+//            System.out.println("Fixed Rate: " + fixedRateTrue);
+//            System.out.println(product);
+            CodePDF codePDF = new CodePDF(fixedRateTrue, product);
+
+            try {
+
+                boolean status = codePDF.genCodeVer2Pdf();
+                if (status == true) {
+                    JOptionPane.showMessageDialog(null, "Barcode PDF generated in software directory");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Same file named already in used!");
+                }
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(PosScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_supplyBarcodeLabelActionPerformed
+
+    List<Product> shopDistributedProducts;
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        // TODO add your handling code here:
+        int indx = distProductNameCB.getSelectedIndex();
+        Double sellRate = 0.0;
+        Double buyRate = 0.0;
+
+        if (indx != Enum.invalidIndex) {
+            SOPIndex sopIndex = sopIndexs.get(indx);
+            SupplierOrderProduct sop = search.searchSupplierOrderProduct(suppliers, sopIndex);
+            try {
+                sellRate = Double.parseDouble(distSellRateField.getText());
+                buyRate = Double.parseDouble(supplierBuyRateField.getText());
+            } catch (NumberFormatException nfe) {
+                System.out.println(nfe.getMessage());
+
+            }
+
+            if (sellRate < sop.getSupplierRate()) {
+                JOptionPane.showMessageDialog(null, "Please set the sell rate");
+            } else {
+
+                int shopIndex = distShopCB.getSelectedIndex();
+                Shop shop = shops.get(shopIndex);
+
+                int quantity = Integer.parseInt(distQuantityCB.getSelectedItem().toString());
+                if (quantity > 0) {
+
+                    Product prevProduct = productService.previousProductQuantityInShop(sop.getSupplierProductId(), shop.getShopId());
+                    System.out.println("Previous Quantity:" + prevProduct);
+
+                    if (prevProduct == null) {
+                        Product product = new Product();
+                        product.setProductBarcode(idBuilder.geProductUniqueID());
+                        product.setProductBuyRate(buyRate);
+                        product.setProductSellRate(sellRate);
+                        product.setProductStock(quantity);
+                        product.setProductName(sop.getSupplierProductName());
+                        product.setShopId(shop.getShopId());
+                        product.setProductInfoUpdated(DateUtil.convertDateToTimestamp(new Date()));
+                        product.setSupplierProductId(sop.getSupplierProductId());
+                        System.out.println(product);
+
+                        int savedId = productService.saveProduct(product);
+                        if (savedId != Enum.invalidIndex) {
+                            quantity = currentSupplierOrderProductQuantity(sop);
+                            supplierAdder.refreshQuantityList(distQuantityCB, quantity);
+
+                            shopDistributedProducts = productService.getDistributedProducts(sop.getSupplierProductId());
+                            productAdder.addDistributedProductsInStockView(shopDistributedProducts, productSuppliedTable);
+
+                            System.out.println("Product Distributed!");
+                        }
+
+                    } else {
+                        int newStock = quantity + prevProduct.getProductStock();
+                        prevProduct.setProductStock(newStock);
+                        boolean status = productService.updateProduct(prevProduct);
+                        if (status) {
+                            quantity = currentSupplierOrderProductQuantity(sop);
+                            supplierAdder.refreshQuantityList(distQuantityCB, quantity);
+
+                            shopDistributedProducts = productService.getDistributedProducts(sop.getSupplierProductId());
+                            productAdder.addDistributedProductsInStockView(shopDistributedProducts, productSuppliedTable);
+
+                            System.out.println("Product Updated!");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select minimum stock!");
+                }
+            }
+        }
+    }//GEN-LAST:event_jButton16ActionPerformed
+
+    private void distShopCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distShopCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_distShopCBActionPerformed
+
+    private void distQuantityCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distQuantityCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_distQuantityCBActionPerformed
+
+    private void distProductNameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distProductNameCBActionPerformed
+        // TODO add your handling code here:
+        int productIndex = distProductNameCB.getSelectedIndex();
+        if (productIndex != Enum.invalidIndex) {
+            if (sopIndexs != null) {
+                SOPIndex sopIndex = sopIndexs.get(productIndex);
+                SupplierOrderProduct sop = search.searchSupplierOrderProduct(suppliers, sopIndex);
+
+                supplierBuyRateField.setText(String.format("%.2f", sop.getSupplierRate()));
+                distSellRateField.setText(String.format("%.2f", sop.getSupplierRate()));
+                int soldQuantity = customerOrderService.countSupplierProductSoldQuantity(sop.getSupplierProductId());
+                int distributedQuantity = productService.countDistributedProduct(sop.getSupplierProductId());
+                supplierAdder.refreshQuantityList(distQuantityCB, sop.getSupplierProductQuantity() - soldQuantity - distributedQuantity);
+
+                shopDistributedProducts = productService.getDistributedProducts(sop.getSupplierProductId());
+                productAdder.addDistributedProductsInStockView(shopDistributedProducts, productSuppliedTable);
+            }
+        }
+    }//GEN-LAST:event_distProductNameCBActionPerformed
+
+    private void distSupplierNameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distSupplierNameCBActionPerformed
+        // TODO add your handling code here:
+
+        int supplierIndex = distSupplierNameCB.getSelectedIndex();
+        if (supplierIndex != Enum.invalidIndex) {
+            Supplier supplier = suppliers.get(supplierIndex);
+            sopIndexs = supplierAdder.refreshSupplierProductList(distProductNameCB, supplier, supplierIndex);
+            if (!supplier.getSupplierOrders().isEmpty()) {
+                SupplierOrder so = supplier.getSupplierOrders().get(0);
+                if (!so.getSupplierProducts().isEmpty()) {
+                    SupplierOrderProduct sop = so.getSupplierProducts().get(0);
+                    supplierBuyRateField.setText(String.format("%.2f", sop.getSupplierRate()));
+                    supplierAdder.refreshQuantityList(distQuantityCB, sop.getSupplierProductQuantity());
+                }
+            }
+        }
+    }//GEN-LAST:event_distSupplierNameCBActionPerformed
+
+    private void fixedRateCkBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedRateCkBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fixedRateCkBActionPerformed
+
+    private void supplierBuyRateFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_supplierBuyRateFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_supplierBuyRateFieldActionPerformed
+
+    private void orderProductSellButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orderProductSellButtonActionPerformed
+        // TODO add your handling code here:
+        int supplierIndex = supplierCB.getSelectedIndex();
+        if (supplierIndex != Enum.invalidIndex) {
+            int orderRowIndex = supplierTable.getSelectedRow();
+            if (orderRowIndex != Enum.invalidIndex) {
+                Supplier supplier = suppliers.get(supplierIndex);
+                SupplierOrder so = supplier.getSupplierOrders().get(orderRowIndex);
+                List<SupplierOrderProduct> supplierOrderProducts = so.getSupplierProducts();
+                SupplierOrderProductReportAdder sopra = new SupplierOrderProductReportAdder(customerOrderService, supplierReturnProductService);
+                List<SupplierOrderProductReport> soprs = sopra.getSupplierOrderProductReports(supplierOrderProducts);
+                SupplierOrderReport sor = new SupplierOrderReport(soprs, so);
+                OrderProductReportPanel panel = new OrderProductReportPanel(sor);
+                JDialog dialogView = new JDialog();
+                dialogView.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+                dialogView.setContentPane(panel);
+                dialogView.pack();
+                dialogView.setVisible(true);
+            }
+
+        }
+    }//GEN-LAST:event_orderProductSellButtonActionPerformed
+
+    private int currentSupplierOrderProductQuantity(SupplierOrderProduct sop) {
+        int soldQuantity = customerOrderService.countSupplierProductSoldQuantity(sop.getSupplierProductId());
+        int distributedQuantity = productService.countDistributedProduct(sop.getSupplierProductId());
+        return sop.getSupplierProductQuantity() - soldQuantity - distributedQuantity;
+    }
 
     private void updateSellReportView() {
 
@@ -3017,14 +3894,19 @@ public class PosScreen extends javax.swing.JFrame {
             javax.swing.UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
 //            javax.swing.UIManager.setLookAndFeel("com.jtattoo.plaf.texture.TextureLookAndFeel");
 //            javax.swing.UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
+
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PosScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PosScreen.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PosScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PosScreen.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PosScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PosScreen.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PosScreen.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PosScreen.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -3038,6 +3920,7 @@ public class PosScreen extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField OrderIDCodeField;
     private javax.swing.JMenuItem aboutItem;
     private javax.swing.JPanel accountCreatePanel;
     private javax.swing.JPanel acpEnclosedPanel;
@@ -3046,19 +3929,10 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JButton addStafFinalButton;
     private javax.swing.JButton addUserButtonACP;
     private javax.swing.JLabel addUserStatusLabel;
+    private javax.swing.JPanel annualReportPanel;
     private javax.swing.JComboBox authorityComboACP;
     private javax.swing.JButton backButtonACP;
     private javax.swing.JMenuItem backupDateItem;
-    private javax.swing.JPanel barcodeGenerationPanel;
-    private javax.swing.JLabel barcodeInfoLabel;
-    private javax.swing.JPanel barcodeInputPanel;
-    private javax.swing.JLabel barcodeQuantityLabel;
-    private javax.swing.JPanel barcodeSimulatePanel;
-    private javax.swing.JTextField barcodeTKField;
-    private javax.swing.JTextField barcodeViewField;
-    private javax.swing.JPanel barcodeViewPanel;
-    private javax.swing.JButton bcodeGenButton;
-    private javax.swing.JTextField cancelOrderField;
     private javax.swing.JLabel cashBackViewLabel;
     private javax.swing.JTextField cashField;
     private javax.swing.JLabel categoryExpenseTotalLabel;
@@ -3072,6 +3946,11 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JCheckBox defaultSellRateChoose;
     private javax.swing.JMenuItem developerItem;
     private javax.swing.JTextField discountField;
+    private javax.swing.JComboBox distProductNameCB;
+    private javax.swing.JComboBox distQuantityCB;
+    private javax.swing.JTextField distSellRateField;
+    private javax.swing.JComboBox distShopCB;
+    private javax.swing.JComboBox distSupplierNameCB;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exitItem;
     private javax.swing.JTextField expAmountField;
@@ -3081,19 +3960,27 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JButton expenditureDeleteButton;
     private javax.swing.JTable expenseTable;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JCheckBox fixedRateCkB;
     private javax.swing.JLabel forgotLabel;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -3114,11 +4001,11 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
@@ -3126,24 +4013,38 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
     private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
+    private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
+    private javax.swing.JLabel jLabel46;
+    private javax.swing.JLabel jLabel47;
+    private javax.swing.JLabel jLabel48;
+    private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel50;
+    private javax.swing.JLabel jLabel51;
+    private javax.swing.JLabel jLabel52;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JButton logIn;
     private javax.swing.JLabel logInError;
     private javax.swing.JPanel logPanelEnclosed;
@@ -3161,11 +4062,14 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JButton newOrderCreateButton;
     private javax.swing.JPanel oldOrderViewPanel;
     private javax.swing.JButton openShopButton;
+    private javax.swing.JMenuItem optionItem;
+    private javax.swing.JPanel optionPanel;
     private javax.swing.JButton orderCompleteButton;
     private javax.swing.JPanel orderFinalizePanel;
     private javax.swing.JLabel orderIDViewLabel;
     private javax.swing.JPanel orderInputPanel;
     private javax.swing.JTextField orderPProductBarcodeField;
+    private javax.swing.JButton orderProductSellButton;
     private javax.swing.JPanel orderViewPanel;
     private javax.swing.JScrollPane orderViewScroll;
     private javax.swing.JTable orderViewTable;
@@ -3173,16 +4077,21 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JPasswordField passField2ACP;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
-    private javax.swing.JTextField previousCodeField;
     private javax.swing.JLabel productCodeLabel;
     private javax.swing.JLabel productInfoLabel;
+    private javax.swing.JButton productSellButton;
+    private javax.swing.JTable productSuppliedTable;
     private javax.swing.JTextField psBuyRateField;
     private javax.swing.JTextField psCodeField;
     private javax.swing.JTextField psNameField;
     private javax.swing.JTextField psQuantityField;
     private javax.swing.JTextField psSellRateField;
     private javax.swing.JButton removeOtItemButton;
+    private javax.swing.JButton reportButton;
     private javax.swing.JPanel reportPanel;
+    private javax.swing.JTabbedPane reportTabbedPane;
+    private javax.swing.JPanel reportToolBarPanel;
+    private javax.swing.JPanel reportViewPanel;
     private javax.swing.JButton reset;
     private javax.swing.JLabel roleLabel;
     private javax.swing.JButton saveExpenseButton;
@@ -3213,6 +4122,20 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JPanel stockInputPanel;
     private javax.swing.JScrollPane stockScroll;
     private javax.swing.JTable stockTable;
+    private javax.swing.JButton supplierButton;
+    private javax.swing.JTextField supplierBuyRateField;
+    private javax.swing.JComboBox supplierCB;
+    private javax.swing.JPanel supplierDetailsPanel;
+    private com.toedter.calendar.JDateChooser supplierOrderDate;
+    private javax.swing.JTabbedPane supplierTabPanned;
+    private javax.swing.JTable supplierTable;
+    private javax.swing.JLabel supplierTotalBillLabel;
+    private javax.swing.JLabel supplierTotalDueLabel;
+    private javax.swing.JLabel supplierTotalPaidLabel;
+    private javax.swing.JButton supplyBarcodeLabel;
+    private javax.swing.JPanel supplyOrderEntryPanel;
+    private javax.swing.JPanel supplyProductDistPanel;
+    private javax.swing.JPanel supplyViewPanel;
     private javax.swing.JMenuItem supportItem;
     private javax.swing.JLabel totalBillViewLabel;
     private javax.swing.JLabel totalDueLabel;

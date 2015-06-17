@@ -6,6 +6,7 @@
 package com.coderbd.pos.utils;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -69,6 +70,9 @@ public class DateUtil {
     }
 
     public static Timestamp convertDateToTimestamp(Date date) {
+        if (date == null) {
+            date = new Date();
+        }
         Timestamp timestamp = new Timestamp(date.getTime());
         return timestamp;
     }
@@ -78,6 +82,16 @@ public class DateUtil {
         cal.setTime(timestamp);
         Date date = new Date(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         return date;
+    }
+
+    public static String getStandardDate(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-YY");
+        return simpleDateFormat.format(date);
+    }
+
+    public static String getStandardDate(Date date, String format) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
     }
 
 }

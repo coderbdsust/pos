@@ -1,35 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!--
-    This is the previous configuration which is working fine!
--->
-
-<!--<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-    http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context-4.1.xsd
-    http://www.springframework.org/schema/tx
-    http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
-
-    
-    <context:component-scan base-package="com.coderbd.pos.dao"/>
-    <context:component-scan base-package="com.coderbd.pos.service"/>
-    
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-        <property name="url" value="jdbc:mysql://localhost:3306/pos"></property>
-        <property name="username" value="root"></property>
-        <property name="password" value="coderbd"></property>
-    </bean>
-</beans>-->
-
-
-<!---This config not working-->
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -50,5 +20,5 @@
     </bean>
     
     <tx:annotation-driven transaction-manager="transactionManager"/>
-    
+
 </beans>

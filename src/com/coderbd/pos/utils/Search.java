@@ -5,10 +5,13 @@
  */
 package com.coderbd.pos.utils;
 
-import com.coderbd.pos.entity.pojo.ShopOrder;
 import com.coderbd.pos.constraints.Enum;
 import com.coderbd.pos.entity.OrderProduct;
 import com.coderbd.pos.entity.Product;
+import com.coderbd.pos.entity.Supplier;
+import com.coderbd.pos.entity.SupplierOrderProduct;
+import com.coderbd.pos.entity.pojo.ShopOrder;
+import com.coderbd.pos.utils.index.SOPIndex;
 import java.util.List;
 
 /**
@@ -49,6 +52,17 @@ public class Search {
             searchIndex++;
         }
         return Enum.invalidIndex;
+    }
+
+    public SupplierOrderProduct searchSupplierOrderProduct(List<Supplier> suppliers, SOPIndex sopIndex) {
+
+        SupplierOrderProduct sop = suppliers.get(sopIndex.getSupplierIndex())
+                .getSupplierOrders()
+                .get(sopIndex.getSupplierOrderIndex())
+                .getSupplierProducts()
+                .get(sopIndex.getProductIndex());
+
+        return sop;
     }
 
 }

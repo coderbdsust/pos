@@ -15,7 +15,9 @@ import java.util.Objects;
 public class Product {
 
     private int productId;
+    private int supplierProductId;
     private int shopId;
+    private Shop shop;
     private String productBarcode;
     private String productName;
     private double productBuyRate;
@@ -58,12 +60,53 @@ public class Product {
         this.productStock = productStock;
     }
 
+    public Product(int productId, int supplierProductId, int shopId, String productBarcode, String productName, double productBuyRate, double productSellRate, Timestamp productInfoUpdated, int productStock) {
+        this.productId = productId;
+        this.supplierProductId = supplierProductId;
+        this.shopId = shopId;
+        this.productBarcode = productBarcode;
+        this.productName = productName;
+        this.productBuyRate = productBuyRate;
+        this.productSellRate = productSellRate;
+        this.productInfoUpdated = productInfoUpdated;
+        this.productStock = productStock;
+    }
+
+    public Product(int productId, int supplierProductId, int shopId, Shop shop, String productBarcode, String productName, double productBuyRate, double productSellRate, Timestamp productInfoUpdated, int productStock) {
+        this.productId = productId;
+        this.supplierProductId = supplierProductId;
+        this.shopId = shopId;
+        this.shop = shop;
+        this.productBarcode = productBarcode;
+        this.productName = productName;
+        this.productBuyRate = productBuyRate;
+        this.productSellRate = productSellRate;
+        this.productInfoUpdated = productInfoUpdated;
+        this.productStock = productStock;
+    }
+
+    public Shop getShop() {
+        return shop;
+    }
+
+    public void setShop(Shop shop) {
+        this.shop = shop;
+    }
+
     public int getProductId() {
         return productId;
     }
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public int getSupplierProductId() {
+        return supplierProductId;
+    }
+
+    public void setSupplierProductId(int supplierProductId) {
+        this.supplierProductId = supplierProductId;
     }
 
     public int getShopId() {
@@ -123,58 +166,8 @@ public class Product {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 61 * hash + this.productId;
-        hash = 61 * hash + this.shopId;
-        hash = 61 * hash + Objects.hashCode(this.productBarcode);
-        hash = 61 * hash + Objects.hashCode(this.productName);
-        hash = 61 * hash + (int) (Double.doubleToLongBits(this.productBuyRate) ^ (Double.doubleToLongBits(this.productBuyRate) >>> 32));
-        hash = 61 * hash + (int) (Double.doubleToLongBits(this.productSellRate) ^ (Double.doubleToLongBits(this.productSellRate) >>> 32));
-        hash = 61 * hash + Objects.hashCode(this.productInfoUpdated);
-        hash = 61 * hash + this.productStock;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Product other = (Product) obj;
-        if (this.productId != other.productId) {
-            return false;
-        }
-        if (this.shopId != other.shopId) {
-            return false;
-        }
-        if (!Objects.equals(this.productBarcode, other.productBarcode)) {
-            return false;
-        }
-        if (!Objects.equals(this.productName, other.productName)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.productBuyRate) != Double.doubleToLongBits(other.productBuyRate)) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.productSellRate) != Double.doubleToLongBits(other.productSellRate)) {
-            return false;
-        }
-        if (!Objects.equals(this.productInfoUpdated, other.productInfoUpdated)) {
-            return false;
-        }
-        if (this.productStock != other.productStock) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public String toString() {
-        return "Product{" + "productId=" + productId + ", shopId=" + shopId + ", productBarcode=" + productBarcode + ", productName=" + productName + ", productBuyRate=" + productBuyRate + ", productSellRate=" + productSellRate + ", productInfoUpdated=" + productInfoUpdated + ", productStock=" + productStock + '}';
+        return "Product{" + "productId=" + productId + ", supplierProductId=" + supplierProductId + ", shopId=" + shopId + ", shop=" + shop + ", productBarcode=" + productBarcode + ", productName=" + productName + ", productBuyRate=" + productBuyRate + ", productSellRate=" + productSellRate + ", productInfoUpdated=" + productInfoUpdated + ", productStock=" + productStock + '}';
     }
 
 }

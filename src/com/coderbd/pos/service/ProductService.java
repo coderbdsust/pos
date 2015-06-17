@@ -6,6 +6,7 @@
 package com.coderbd.pos.service;
 
 import com.coderbd.pos.dao.ProductsDao;
+import com.coderbd.pos.dao.ShopsDao;
 import com.coderbd.pos.entity.Product;
 import com.coderbd.pos.entity.Shop;
 import java.util.List;
@@ -37,9 +38,24 @@ public class ProductService {
     public List<Product> getProducts(Shop shop) {
         return productsDao.getProducts(shop);
     }
+    
+    public List<Product> getDistributedProducts(int supplierProductId) {
+        return productsDao.getDistributedProducts(supplierProductId);
+    }
 
     public boolean deleteProductById(int productId) {
         return productsDao.deleteProductById(productId);
     }
 
+    public int saveProduct(Product product) {
+        return productsDao.saveProduct(product);
+    }
+
+    public int countDistributedProduct(int supplierProductId) {
+        return productsDao.countDistributedProductQuantity(supplierProductId);
+    }
+
+    public Product previousProductQuantityInShop(int supplierProductId, int shopId) {
+        return productsDao.getProductQuantityInShop(supplierProductId, shopId);
+    }
 }

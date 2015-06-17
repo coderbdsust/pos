@@ -15,6 +15,7 @@ public class Message {
     public static String ERROR_PASSWORD = "CHECK THE PASSWORD!";
     public static String ERROR_PASSWORD_NOT_MATCHED = "PASSWORD NOT MATCHED!";
     public static String ERROR_INVALID_INPUT = "INVALID INPUT!";
+    public static String ERROR_INVALID_MOBILE = "INVALID MOBILE NUMBER!";
     public static String ERROR_INVALID_AMOUNT = "INVALID AMOUNT INPUT!";
     public static String ERROR_INVALID_USRER_INFO = "INVALID USERNAME/PASSWORD";
     public static String ERROR_ROLE_NOT_ASSIGNED = "SORRY, YOUR ROLE NOT ASSIGNED IN ANY SHOP!";
@@ -27,6 +28,7 @@ public class Message {
     public static String ERROR_INVALID_BARCODE_ID = "PLEASE, GIVE VALID BARCODE ID!";
     public static String ERROR_INVALID_BARCODE_SIZE = "BARCODE LENGTH IS INVALID!";
     public static String ERROR_SAME_USER_OR_CONNECTION_ERROR = "DB CONNECTION ERROR OR SAME USERNAME!";
+    public static String ERROR_CONNECTION_ERROR = "DB CONNECTION ERROR!";
     public static String ERROR_DUPLICATE_BARCODE = "DUPLICATE BARCODE ID , TRY ANOTHER!";
 
     public static String SUCCESS_STAFF_ADDED = "STAFF ADDED SUCCESSFULLY TO THIS SHOP";
@@ -35,5 +37,6 @@ public class Message {
     public static String SUCCESS_SHOP_CREATED = "SHOP SUCCESSFULLY ADDED";
     public static String ERROR_PRODUCT_NOT_FOUND = "BARCODE NOT MATCHED WITH ANY PRODUCT!";
     public static String ERROR_PRODUCT_OUT_OF_STOCK = "OUT OF STOCK!";
+    public static String SUCCESS_SUPPLIER_ADDED="SUPPLIER SUCCESSFULLY CREATED";
 
 }

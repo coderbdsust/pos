@@ -83,4 +83,7 @@ public class CustomerOrderService {
         return customerOrdersDao.updateCustomerOrderAmount(dummyOrder);
     }
 
+    public int countSupplierProductSoldQuantity(int supplierProductId) {
+        return orderProductsDao.countProductSoldQuantity(supplierProductId);
+    }
 }
