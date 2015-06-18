@@ -49,10 +49,13 @@ public class SupplierService {
             List<SupplierOrder> supplierOrders = supplierOrdersDao.getSupplierOrders(supplier);
             System.out.println("SO: " +supplierOrders);
             for (SupplierOrder so : supplierOrders) {
+                
                 List<SupplierOrderPayment> supplierOrderPayments = supplierOrderPaymentsDao.getSupplierOrderPayments(so);
                 System.out.println("payments:" + supplierOrderPayments);
+                
                 List<SupplierOrderProduct> supplierOrderProducts = supplierProductsDao.getSupplierOrderProducts(so);
                 System.out.println("products:" + supplierOrderProducts);
+                
                 so.setSupplierOrderPayments(supplierOrderPayments);
                 so.setSupplierProducts(supplierOrderProducts);
             }

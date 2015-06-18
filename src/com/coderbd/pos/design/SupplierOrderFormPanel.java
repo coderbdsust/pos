@@ -17,7 +17,9 @@ import com.coderbd.pos.utils.Reset;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -32,35 +34,32 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
     private SupplierOrder supplierOrder;
 
     private SupplierOrderService orderService;
-    private SupplierProductService productService;
+    private SupplierProductService supplierProductService;
     private SupplierOrderPaymentService paymentService;
 
     /**
      * Creates new form SupplierOrderFormPanel
      */
-    public SupplierOrderFormPanel(SupplierOrder supplierOrder, SupplierOrderService orderService, SupplierProductService productService, SupplierOrderPaymentService paymentService) {
+    public SupplierOrderFormPanel(SupplierOrder supplierOrder, SupplierOrderService orderService, SupplierProductService supplierProductService, SupplierOrderPaymentService paymentService) {
 
         initComponents();
         this.supplierOrder = supplierOrder;
         this.orderService = orderService;
-        this.productService = productService;
+        this.supplierProductService = supplierProductService;
         this.paymentService = paymentService;
         Reset.resetTable(psoTable);
         Reset.resetTable(paymentTable);
         panelTitle.setText(supplierOrder.getSupplier().getSupplierName() + ", " + supplierOrder.getSupplier().getSupplierMobile());
-        updateAllForm();
+        addAllOrderProductItemInTable();
+        addAllPaymentItemInTable();
         updateBillingInfo();
     }
 
-    private void updateAllForm() {
-        addAllOrderProductItemInTable();
-        addAllPaymentItemInTable();
-        totalBill = supplierOrder.getTotalBill();
-        totalPaid = supplierOrder.getTotalPaid();
-        totalDue = totalBill - totalPaid;
-    }
-
     private void updateBillingInfo() {
+
+        totalBill = supplierOrder.getSupplierProductTotalBill();
+        totalPaid = supplierOrder.getSupplierOrderTotalPayment();
+        totalDue = totalBill - totalPaid;
         totalBillLabel.setText(totalBill.toString());
         totalPaidLabel.setText(totalPaid.toString());
         totalDueLabel.setText(totalDue.toString());
@@ -68,7 +67,7 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
 
     private void addAllOrderProductItemInTable() {
         DefaultTableModel tableModel = (DefaultTableModel) psoTable.getModel();
-
+        Reset.resetTable(psoTable);
         List<SupplierOrderProduct> supplierOrderProducts = supplierOrder.getSupplierProducts();
         if (supplierOrderProducts != null) {
             for (SupplierOrderProduct sop : supplierOrderProducts) {
@@ -155,6 +154,7 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         panelTitle = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         paymentInputPanel = new javax.swing.JPanel();
         paymentDateC = new com.toedter.calendar.JDateChooser();
         paymentField = new javax.swing.JTextField();
@@ -204,10 +204,17 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Quantity");
 
-        jLabel3.setText("Rate");
+        jLabel3.setText("Buy Rate");
 
         panelTitle.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         panelTitle.setText("Fashion Park");
+
+        jButton1.setText("Update Item");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout productInputPanelLayout = new javax.swing.GroupLayout(productInputPanel);
         productInputPanel.setLayout(productInputPanelLayout);
@@ -222,14 +229,17 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(productInputPanelLayout.createSequentialGroup()
-                        .addComponent(pQuantityField, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(productInputPanelLayout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(addPItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(productInputPanelLayout.createSequentialGroup()
+                        .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(pQuantityField, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(addPItemButton, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(productInputPanelLayout.createSequentialGroup()
@@ -253,7 +263,8 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(removePItemButton)
-                    .addComponent(addPItemButton))
+                    .addComponent(addPItemButton)
+                    .addComponent(jButton1))
                 .addContainerGap())
             .addGroup(productInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(productInputPanelLayout.createSequentialGroup()
@@ -424,6 +435,11 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
             }
         });
         psoTable.getTableHeader().setReorderingAllowed(false);
+        psoTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                psoTableMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(psoTable);
 
         jPanel3.add(jScrollPane2, "card2");
@@ -472,12 +488,12 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
         SupplierOrderProduct sop = new SupplierOrderProduct();
 
         String productName = supplierOrder.getSupplier().getSupplierName() + "_O" + supplierOrder.getSupplierOrderId() + "_P" + (supplierOrder.getSupplierProducts().size() + 1);
-        //   pNameField.setText(productName)
 
         if (pNameField.getText().replace(" ", "").length() != 0 && !pNameField.getText().equals("")) {
             String userDefinedName = pNameField.getText();
             productName = productName + "_" + userDefinedName;
         }
+
         if (!pQuantityField.getText().equals("") && !pRateField.getText().equals("")) {
             try {
                 sop.setSupplierOrderId(supplierOrder.getSupplierOrderId());
@@ -485,7 +501,7 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
                 sop.setSupplierProductQuantity(Integer.parseInt(pQuantityField.getText()));
                 sop.setSupplierRate(Double.parseDouble(pRateField.getText()));
 
-                int supplierProductId = productService.saveSupplierProduct(sop);
+                int supplierProductId = supplierProductService.saveSupplierProduct(sop);
 
                 if (supplierProductId != Enum.invalidIndex) {
                     sop.setSupplierProductId(supplierProductId);
@@ -507,6 +523,7 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
                 System.out.println(nfe.getMessage());
             }
         }
+
         pNameField.setText("");
         pQuantityField.setText("");
         pRateField.setText("");
@@ -518,7 +535,7 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         int rowSelected = psoTable.getSelectedRow();
         SupplierOrderProduct sop = supplierOrder.getSupplierProducts().get(rowSelected);
-        boolean status = productService.deleteSupplierProduct(sop);
+        boolean status = supplierProductService.deleteSupplierProduct(sop);
         if (status) {
             supplierOrder.getSupplierProducts().remove(rowSelected);
             removeItemFromTable(psoTable, rowSelected);
@@ -557,14 +574,17 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
             sop.setSupplierOrderId(supplierOrder.getSupplierOrderId());
             System.out.println("ADD PAYMNENT:" + sop);
             int supplierOrderPaidId = paymentService.saveSupplierOrderPayment(sop);
+            System.out.println("pass save!");
             if (supplierOrderPaidId != Enum.invalidIndex) {
                 sop.setSupplierOrderPaymentId(supplierOrderPaidId);
+                System.out.println("adding started");
                 addPaymentItemInTable(sop);
+                System.out.println("adding finished!");
                 supplierOrder.getSupplierOrderPayments().add(sop);
-
+                System.out.println("sopay add");
                 totalPaid = supplierOrder.getSupplierOrderTotalPayment();
                 totalDue = totalBill - totalPaid;
-
+                System.out.println("sop pay getting");
                 updateBillingInfo();
 
                 paymentField.setText("");
@@ -609,11 +629,94 @@ public class SupplierOrderFormPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_removePaymentBActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int rowIndx = psoTable.getSelectedRow();
+        if (rowIndx != Enum.invalidIndex) {
+            SupplierOrderProduct sop = supplierOrder.getSupplierProducts().get(rowIndx);
+            String name = sop.getSupplierProductName();
+            String[] words = name.split("_");
+            String lastword = words[words.length - 1];
+            if (lastword.charAt(0) == 'P' && (lastword.charAt(1) >= '0' && lastword.charAt(1) <= '9')) {
+                lastword = "";
+            }
+            String namePrefix = namePrefix = name.substring(0, name.length() - lastword.length());
+
+            Integer quantity = sop.getSupplierProductQuantity();
+            Double rate = sop.getSupplierRate();
+
+            JTextField nameField = new JTextField();
+            JTextField quantityField = new JTextField();
+            JTextField rateField = new JTextField();
+
+            nameField.setText(lastword);
+            quantityField.setText(quantity.toString());
+            rateField.setText(rate.toString());
+
+            Object[] fields = {
+                "Product Name \n(" + namePrefix + ")", nameField,
+                "Quantity ", quantityField,
+                "Buy Rate ", rateField
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, fields, "Update Order Product", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == JOptionPane.OK_OPTION) {
+
+                String newName = nameField.getText();
+                if (newName.equals("")) {
+                    newName = namePrefix.substring(0, namePrefix.length() - 1);
+                } else {
+                    if (namePrefix.charAt(namePrefix.length() - 1) == '_') {
+                        newName = namePrefix + newName;
+                    } else {
+                        newName = namePrefix + "_" + newName;
+                    }
+                }
+
+                Integer newQuantity = Integer.parseInt(quantityField.getText());
+                Double newRate = Double.parseDouble(rateField.getText());
+
+                SupplierOrderProduct nSop = new SupplierOrderProduct();
+                nSop.setSupplierOrderId(sop.getSupplierOrderId());
+                nSop.setSupplierProductId(sop.getSupplierProductId());
+                nSop.setSupplierProductName(newName);
+                nSop.setSupplierProductQuantity(newQuantity);
+                nSop.setSupplierRate(newRate);
+
+                boolean status = supplierProductService.updateSupplierProduct(nSop);
+
+                if (status == true) {
+                    sop.setSupplierProductName(newName);
+                    sop.setSupplierProductQuantity(newQuantity);
+                    sop.setSupplierRate(newRate);
+                    addAllOrderProductItemInTable();
+                    updateBillingInfo();
+                    supplierOrder.setTotalBill(totalBill);
+                    supplierOrder.setTotalPaid(totalPaid);
+                    status = orderService.updateSupplierOrder(supplierOrder);
+                    System.out.println("Order Service Update: " + status);
+                }
+            } else {
+                System.out.println("Cancel!");
+            }
+
+        } else {
+            System.out.println("Invalid Row");
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void psoTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_psoTableMouseClicked
+        // TODO add your handling code here:
+        System.out.println("PSO TABLE SELECTED!");
+    }//GEN-LAST:event_psoTableMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPItemButton;
     private javax.swing.JButton addPaymentB;
     private javax.swing.JTextField descField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -178,11 +178,11 @@ public class OrderProductReportPanel extends javax.swing.JPanel {
                     .addComponent(jLabel10)
                     .addComponent(jLabel13)
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel5))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         add(jPanel1, java.awt.BorderLayout.PAGE_END);

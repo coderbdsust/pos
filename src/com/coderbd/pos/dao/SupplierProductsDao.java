@@ -143,4 +143,24 @@ public class SupplierProductsDao {
         }
     }
 
+    public boolean updateSupplierOrderProduct(SupplierOrderProduct sop) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("supplier_product_id", sop.getSupplierProductId());
+        params.addValue("supplier_product_name", sop.getSupplierProductName());
+        params.addValue("supplier_rate", sop.getSupplierRate());
+        params.addValue("supplier_product_quantity", sop.getSupplierProductQuantity());
+
+        try {
+            return jdbc.update("update pos.supplier_products set supplier_product_name=:supplier_product_name,"
+                    + " supplier_rate=:supplier_rate, supplier_product_quantity=:supplier_product_quantity"
+                    + " where supplier_product_id=:supplier_product_id", params) == 1;
+        } catch (CannotGetJdbcConnectionException conExp) {
+            System.out.println(conExp.getMessage());
+            return false;
+        } catch (DataAccessException dae) {
+            System.out.println(dae.getMessage());
+            return false;
+        }
+    }
+
 }

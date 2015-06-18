@@ -23,6 +23,10 @@ public class SupplierProductService {
     public int saveSupplierProduct(SupplierOrderProduct sop) {
         return supplierProductsDao.saveSupplierOrderProduct(sop);
     }
+    
+    public boolean updateSupplierProduct(SupplierOrderProduct sop) {
+        return supplierProductsDao.updateSupplierOrderProduct(sop);
+    }
 
     public boolean deleteSupplierProduct(SupplierOrderProduct sop) {
         return supplierProductsDao.deleteSupplierOrderProduct(sop);
