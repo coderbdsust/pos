@@ -50,5 +50,11 @@ public class IDBuilder {
         int randomValue = random.nextInt(maxRange - minRange) + minRange;
         return randomValue;
     }
+    
+    public static String randomSID(int minRange, int maxRange) {
+        Random random = new Random();
+        Integer randomValue = random.nextInt(maxRange - minRange) + minRange;
+        return randomValue.toString();
+    }
 
 }
