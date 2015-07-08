@@ -6,7 +6,6 @@
 package com.coderbd.pos.design;
 
 import com.coderbd.pos.backup.Backup;
-import com.coderbd.pos.backup.CryptoUtils;
 import com.coderbd.pos.constraints.Enum;
 import com.coderbd.pos.constraints.Message;
 import com.coderbd.pos.constraints.Role;
@@ -25,7 +24,6 @@ import com.coderbd.pos.entity.pojo.ShopExpense;
 import com.coderbd.pos.entity.pojo.ShopOrder;
 import com.coderbd.pos.entity.pojo.SupplierOrderProductReport;
 import com.coderbd.pos.entity.pojo.SupplierOrderReport;
-import com.coderbd.pos.pdf.BarcodePdf;
 import com.coderbd.pos.pdf.CodePDF;
 import com.coderbd.pos.pdf.OrderFileBuilder;
 import com.coderbd.pos.print.Printer;
@@ -226,7 +224,7 @@ public class PosScreen extends javax.swing.JFrame {
         if (shop != null) {
             System.out.println("Stock View Updated");
 //            products = productService.getProducts(shop);
-            productAdder.addProductsInStockView(products, stockTable);
+            productAdder.addProductsInStockView(products, stockTable,shopTotalProductAmountLabel);
         }
     }
 
@@ -325,6 +323,8 @@ public class PosScreen extends javax.swing.JFrame {
         psSellRateField = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
         showProductButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        shopTotalProductAmountLabel = new javax.swing.JLabel();
         stockScroll = new javax.swing.JScrollPane();
         stockTable = new javax.swing.JTable();
         shopExpenditurePanel = new javax.swing.JPanel();
@@ -991,6 +991,12 @@ public class PosScreen extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel3.setText("Total  Product Amount");
+
+        shopTotalProductAmountLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        shopTotalProductAmountLabel.setText("0.0");
+
         javax.swing.GroupLayout stockInputPanelLayout = new javax.swing.GroupLayout(stockInputPanel);
         stockInputPanel.setLayout(stockInputPanelLayout);
         stockInputPanelLayout.setHorizontalGroup(
@@ -1010,23 +1016,27 @@ public class PosScreen extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(psQuantityField, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(psQuantityField, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel21)
+                    .addComponent(psBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(stockInputPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel25)
+                        .addGap(109, 274, Short.MAX_VALUE))
+                    .addGroup(stockInputPanelLayout.createSequentialGroup()
+                        .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel21)
-                            .addComponent(psBuyRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(stockInputPanelLayout.createSequentialGroup()
-                                .addComponent(jLabel25)
-                                .addGap(109, 274, Short.MAX_VALUE))
-                            .addGroup(stockInputPanelLayout.createSequentialGroup()
-                                .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(stockInputPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(shopTotalProductAmountLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(165, Short.MAX_VALUE))
         );
         stockInputPanelLayout.setVerticalGroup(
             stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1047,7 +1057,10 @@ public class PosScreen extends javax.swing.JFrame {
                     .addComponent(jButton10)
                     .addComponent(psSellRateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showProductButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(stockInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(showProductButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(shopTotalProductAmountLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1056,20 +1069,20 @@ public class PosScreen extends javax.swing.JFrame {
         stockTable.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         stockTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Product Code", "Product Name", "Quantity", "Buy Rate", "Sell Rate", "Last Updated"
+                "Product Code", "Product Name", "Quantity", "Quantity Total Amount", "Buy Rate (Unit)", "Sell Rate (Unit)", "Last Updated"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, false
+                false, false, false, false, false, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -3993,6 +4006,7 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
@@ -4104,6 +4118,7 @@ public class PosScreen extends javax.swing.JFrame {
     private javax.swing.JLabel shopSelectErrorLabel;
     private javax.swing.JPanel shopSelectionEnclosedPanel;
     private javax.swing.JTextField shopTinField;
+    private javax.swing.JLabel shopTotalProductAmountLabel;
     private javax.swing.JButton showProductButton;
     private javax.swing.JPanel signBoardPanel;
     private javax.swing.JLabel softUserMobileLabel;
