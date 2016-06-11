@@ -31,7 +31,7 @@ public class ReceiptIndent {
     }
 
     private void printProductTitle() {
-        output += String.format("%-3s %5s %5s %10s %10s\n", "QTY", "DIS ", "VAT(%)", "  Rate   ", "   Total  ");
+        output += String.format("%-3s %5s %5s %10s %10s\n", "QTY", "DIS ", "VAT(%)", "  RATE   ", "   TOTAL  ");
         output += String.format("%-3s %-5s %-5s %10s %10s\n", "---", "----", "----", "----------", "----------");
     }
 
