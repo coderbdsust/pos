@@ -6,6 +6,14 @@ user can create shop, add staff , add product to shop stock, take order with pos
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+Screenshot
+----------------
+
+(https://github.com/coderbdsust/pos/blob/master/png/order.png)
+(https://github.com/coderbdsust/pos/blob/master/png/previous%20order%20list.png)
+(https://github.com/coderbdsust/pos/blob/master/png/shop_stock.png)
+
+
 ### Installing
 
 A step by step series of examples that tell you have to get a development env running
