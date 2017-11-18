@@ -2,6 +2,7 @@
 .project
 .settings
 .pdf
+nbproject/
 
 dist
 bin
