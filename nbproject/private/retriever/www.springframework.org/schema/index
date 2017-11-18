@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>Index of /schema</title>
+</head>
+<body>
+<h1>Index of /schema</h1>
+<ul><li><a href="/"> Parent Directory</a></li>
+<li><a href=".faces/"> .faces/</a></li>
+<li><a href=".web-services/"> .web-services/</a></li>
+<li><a href=".webflow-config/"> .webflow-config/</a></li>
+<li><a href=".webflow/"> .webflow/</a></li>
+<li><a href="aop/"> aop/</a></li>
+<li><a href="batch-integration/"> batch-integration/</a></li>
+<li><a href="batch/"> batch/</a></li>
+<li><a href="beans/"> beans/</a></li>
+<li><a href="cache/"> cache/</a></li>
+<li><a href="cloud/"> cloud/</a></li>
+<li><a href="context/"> context/</a></li>
+<li><a href="data/"> data/</a></li>
+<li><a href="dm-server/"> dm-server/</a></li>
+<li><a href="dtd/"> dtd/</a></li>
+<li><a href="faces/"> faces/</a></li>
+<li><a href="favicon.ico"> favicon.ico</a></li>
+<li><a href="flex/"> flex/</a></li>
+<li><a href="gemfire/"> gemfire/</a></li>
+<li><a href="hadoop/"> hadoop/</a></li>
+<li><a href="insight-idk/"> insight-idk/</a></li>
+<li><a href="integration/"> integration/</a></li>
+<li><a href="jdbc/"> jdbc/</a></li>
+<li><a href="jee/"> jee/</a></li>
+<li><a href="jms/"> jms/</a></li>
+<li><a href="lang/"> lang/</a></li>
+<li><a href="ldap/"> ldap/</a></li>
+<li><a href="mobile/"> mobile/</a></li>
+<li><a href="mvc/"> mvc/</a></li>
+<li><a href="osgi-compendium/"> osgi-compendium/</a></li>
+<li><a href="osgi/"> osgi/</a></li>
+<li><a href="oxm/"> oxm/</a></li>
+<li><a href="rabbit/"> rabbit/</a></li>
+<li><a href="redis/"> redis/</a></li>
+<li><a href="security/"> security/</a></li>
+<li><a href="task/"> task/</a></li>
+<li><a href="tool/"> tool/</a></li>
+<li><a href="tx/"> tx/</a></li>
+<li><a href="util/"> util/</a></li>
+<li><a href="web-services/"> web-services/</a></li>
+<li><a href="webflow-config/"> webflow-config/</a></li>
+<li><a href="webflow/"> webflow/</a></li>
+<li><a href="websocket/"> websocket/</a></li>
+<li><a href="yarn/"> yarn/</a></li>
+</ul>
+<address>Apache/2.2.3 (CentOS) Server at www.springframework.org Port 80</address>
+</body></html>
