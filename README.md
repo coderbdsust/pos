@@ -14,7 +14,7 @@ Say what the step will be
 
 ```
 - Install SQL Database
-- Run the desgin sql from sql folder
+- Run the sql from sql folder
 - connect
 ```
 
