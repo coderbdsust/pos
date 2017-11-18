@@ -9,9 +9,9 @@ These instructions will get you a copy of the project up and running on your loc
 Screenshot
 ----------------
 
-(https://github.com/coderbdsust/pos/blob/master/png/order.png)
-(https://github.com/coderbdsust/pos/blob/master/png/previous%20order%20list.png)
-(https://github.com/coderbdsust/pos/blob/master/png/shop_stock.png)
+![Order Screen](https://github.com/coderbdsust/pos/blob/master/png/order.png)
+![Previous Order List](https://github.com/coderbdsust/pos/blob/master/png/previous%20order%20list.png)
+![Shop Product Stock](https://github.com/coderbdsust/pos/blob/master/png/shop_stock.png)
 
 
 ### Installing
