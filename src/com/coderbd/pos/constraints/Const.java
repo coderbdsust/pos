@@ -14,7 +14,7 @@ public class Const {
     public static final String DB_DRIVER_NAME = "com.mysql.jdbc.Driver";
     public static final String DB_URL = "jdbc:mysql://localhost:3306/pos";
     public static final String DB_USERNAME = "root";
-    public static final String DB_PASSWORD = "coderbd";
+    public static final String DB_PASSWORD = "root";
 
     public static final String DB_HOST = "localhost";
     public static final String DB_PORT = "3306";

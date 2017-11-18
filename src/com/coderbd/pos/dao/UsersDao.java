@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -30,6 +31,7 @@ public class UsersDao {
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
+        Assert.notNull(dataSource);
         this.jdbc = new NamedParameterJdbcTemplate(dataSource);
     }
 
@@ -40,7 +42,7 @@ public class UsersDao {
         params.addValue("password", password);
 
         try {
-            return jdbc.queryForObject("select * from pos.users where "
+            return jdbc.queryForObject("select * from users where "
                     + "(username=:usernameOrMobileNumber or mobile=:usernameOrMobileNumber) and password=:password", params, new RowMapper<User>() {
                         @Override
                         public User mapRow(ResultSet rs, int i) throws SQLException {
