@@ -6,6 +6,7 @@
 package com.coderbd.pos.factory;
 
 import com.coderbd.pos.constraints.Const;
+import com.coderbd.pos.properties.ApplicationProperties;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class DataSourceFactory {
-
+    
     @Bean(name = "dataSource")
     public DataSource createBasicDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
