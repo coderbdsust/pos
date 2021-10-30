@@ -1,6 +1,6 @@
 # Point of Sale (POS)
 
-This software is developed for retail transaction. In this software user can create a shop, add staff members, maintain product stock, can generate receipt, cancel order , can check the overall revenue.
+This software is developed for retail transaction. In this software user can create a shop, add staff members, maintain product stock, can generate receipt, cancel order, can check the overall revenue.
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Background
 
-These project was initiated at 2013 initated by me from getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software.
+These project was initiated at 2013 by me from getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software making it usable.
 
 ## Features Summry with UI
 
