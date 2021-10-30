@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 These project was initiated at 2013 by me from getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software making it usable.
 
-## Features Summry with UI
+## Features Summary with UI
 
 * Intial Menu Screen
 ![Intial Menu](https://github.com/coderbdsust/pos/blob/master/png/menu.png)
