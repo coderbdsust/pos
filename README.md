@@ -4,15 +4,15 @@ This software is developed for retail transaction. In this software user can cre
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment notes on how to deploy the project on a live system.
 
 ## Background
 
-These project was initiated at 2013 by me from getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software making it usable.
+These project was initiated at 2013 by me getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software making it usable.
 
 ## Features Summary with UI
 
-* Intial Menu Screen
+* Initial Menu Screen
 ![Intial Menu](https://github.com/coderbdsust/pos/blob/master/png/menu.png)
 
 * Order Screen
@@ -28,16 +28,21 @@ These project was initiated at 2013 by me from getting inspired from local shop 
 ![Shop Sell Report](https://github.com/coderbdsust/pos/blob/master/png/report.png)
 
 * Maintenance - Product Barcode Generation
-User can generate barcode using this software and save it to this software when adding or changing stock, after printing this barcode user can labeled it in the products.
+
+<br/> User can generate custom barcode for the product and use it in the software for maintaining order, stock.
 
 
 ### Installing
 Say what the step will be
 
 ```
+
 - Install SQL Database
-- Run the SQL from sql folder
-- connect
+- Run the SQL from SQL folder
+- Connect to DB
+- Create an admin user
+- Create other user using these role
+
 ```
 
 ## Deployment
