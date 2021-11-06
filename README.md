@@ -28,8 +28,7 @@ These project was initiated at 2013 by me getting inspired from local shop manag
 ![Shop Sell Report](https://github.com/coderbdsust/pos/blob/master/png/report.png)
 
 * Maintenance - Product Barcode Generation
-
-<br/> User can generate custom barcode for the product and use it in the software for maintaining order, stock.
+<br/>User can generate custom barcode for the product and use it in the software for maintaining order, stock.
 
 
 ### Installing
