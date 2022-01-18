@@ -49,8 +49,8 @@ These project was initiated at 2013 by me getting inspired from local shop manag
 * Work Station
 ![Station](https://github.com/coderbdsust/pos/blob/master/png/software_workstation.jpg)
 
-### Installing
-Say what the step will be
+### Installing & running the application
+For running the application in the local environment, below instructions need to be followed
 
 ```
 
@@ -58,7 +58,7 @@ Say what the step will be
 - Run the SQL from SQL folder
 - Connect to DB
 - Create an admin user
-- Create other user using these role
+- Create other users using defined role
 
 ```
 
