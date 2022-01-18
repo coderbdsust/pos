@@ -8,7 +8,18 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Background
 
-These project was initiated at 2013 by me getting inspired from local shop management software. Even, this software wasn't realeased for public usages. Lots of feature is done in this software making it usable.
+These project was initiated at 2013 by me getting inspired from local shop management software. Even, this software wasn't released for public usages. Lots of feature is done in this software making it usable.
+
+## Features
+
+* Login
+* Landing Menu Screen - Shop Order, Supplier, Report, New Staff, New Shop
+* Customer Order
+* Maintenance - Stock Management
+* Maintenance - Shop Expenditure
+* Maintenance - Modify / Cancel Order
+* Maintenance - Product Barcode & Customer Receipt
+
 
 ## Features Summary with UI
 
@@ -25,11 +36,18 @@ These project was initiated at 2013 by me getting inspired from local shop manag
 ![Shop Product Stock](https://github.com/coderbdsust/pos/blob/master/png/shop_stock.png)
 
 * Maintenance - Sell Report
-![Shop Sell Report](https://github.com/coderbdsust/pos/blob/master/png/report.png)
+![Shop Sell Report 1](https://github.com/coderbdsust/pos/blob/master/png/report.png)
 
-* Maintenance - Product Barcode Generation
+* Maintenance - Shop Sell Report PDF
+![Shop Sell Report 2](https://github.com/coderbdsust/pos/blob/master/png/stock_report.png)
+
+* Maintenance - Product Barcode & Customer Receipts
+![Product Barcode](https://github.com/coderbdsust/pos/blob/master/png/barcode_n_receipt.jpg)
+
 <br/>User can generate custom barcode for the product and use it in the software for maintaining order, stock.
 
+* Work Station
+![Station](https://github.com/coderbdsust/pos/blob/master/png/software_workstation.jpg)
 
 ### Installing
 Say what the step will be
