@@ -24,30 +24,33 @@ These project was initiated at 2013 by me getting inspired from local shop manag
 ## Features Summary with UI
 
 * Initial Menu Screen
-![Intial Menu](https://github.com/coderbdsust/pos/blob/master/png/menu.png)
+![Intial Menu](/png/menu.png)
 
 * Order Screen
-![Order Screen](https://github.com/coderbdsust/pos/blob/master/png/order.png)
+![Order Screen](/png/order.png)
 
 * Maintenance - Order View
-![Previous Order List](https://github.com/coderbdsust/pos/blob/master/png/previous%20order%20list.png)
+![Previous Order List](/png/previous%20order%20list.png)
 
 * Maintenance - Stock Management
-![Shop Product Stock](https://github.com/coderbdsust/pos/blob/master/png/shop_stock.png)
+![Shop Product Stock](/png/shop_stock.png)
 
 * Maintenance - Sell Report
-![Shop Sell Report 1](https://github.com/coderbdsust/pos/blob/master/png/report.png)
+![Shop Sell Report 1](/png/report.png)
 
 * Maintenance - Shop Sell Report PDF
-![Shop Sell Report 2](https://github.com/coderbdsust/pos/blob/master/png/stock_report.png)
+![Shop Sell Report 2](/png/stock_report.png)
 
 * Maintenance - Product Barcode & Customer Receipts
-![Product Barcode](https://github.com/coderbdsust/pos/blob/master/png/barcode_n_receipt.jpg)
+![Product Barcode](/png/barcode_n_receipt.jpg)
 
 <br/>User can generate custom barcode for the product and use it in the software for maintaining order, stock.
 
+* Designing ERD
+![Station](/png/pos_erd.png)
+
 * Work Station
-![Station](https://github.com/coderbdsust/pos/blob/master/png/software_workstation.jpg)
+![Station](/png/software_workstation.jpg)
 
 ### Installing & running the application
 For running the application in the local environment, below instructions need to be followed
